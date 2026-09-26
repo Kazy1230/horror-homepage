@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>――怪奇ノート――</title>
+<link rel="stylesheet" href="common/horror.css">
+<style>
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .index-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8vh 1.5rem 4rem;
+    min-height: 100%;
+  }
+
+  /* このページでは走査線を通常より濃く表示する */
+  .hfx-scanlines {
+    opacity: 0.32;
+  }
+
+  /* 常時、背景がごく薄くグリッチする（不規則な間隔で一瞬だけ走る） */
+  .idle-glitch {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: screen;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 40, 60, 0.18) 0px,
+      rgba(255, 40, 60, 0.18) 2px,
+      rgba(40, 200, 220, 0.12) 2px,
+      rgba(40, 200, 220, 0.12) 3px,
+      transparent 3px,
+      transparent 5px
+    );
+    animation: bg-glitch-cycle 6.5s steps(1, end) infinite;
+  }
+
+  @keyframes bg-glitch-cycle {
+    0%, 96%, 100% { opacity: 0; transform: translateX(0); }
+    96.4%          { opacity: 0.22; transform: translateX(-5px); }
+    96.6%          { opacity: 0; }
+    96.9%          { opacity: 0.16; transform: translateX(4px); }
+    97.1%          { opacity: 0; }
+    97.4%          { opacity: 0.2; transform: translateX(-3px); }
+    97.6%          { opacity: 0; transform: translateX(0); }
+  }
+
+  h1 {
+    position: relative;
+    z-index: 1;
+    font-size: 1.6rem;
+    letter-spacing: 0.3em;
+    margin-bottom: 3rem;
+    color: var(--hfx-fg);
+    animation: title-flicker-in 2.2s ease-out both, title-flicker-idle 7s ease-in-out 2.2s infinite;
+  }
+
+  @keyframes title-flicker-in {
+    0%   { opacity: 0; text-shadow: none; }
+    4%   { opacity: 0.6; }
+    8%   { opacity: 0.1; }
+    12%  { opacity: 0.8; }
+    16%  { opacity: 0.2; }
+    22%  { opacity: 1; text-shadow: 0 0 18px rgba(180, 30, 30, 0.5); }
+    100% { opacity: 0.85; text-shadow: 0 0 6px rgba(180, 30, 30, 0.25); }
+  }
+
+  @keyframes title-flicker-idle {
+    0%, 92%, 100% { opacity: 0.85; }
+    93%           { opacity: 0.3; }
+    94%           { opacity: 0.85; }
+    95%           { opacity: 0.2; }
+    96%           { opacity: 0.85; }
+  }
+
+  .work-list {
+    position: relative;
+    z-index: 1;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .work-list li {
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .work-list a {
+    position: relative;
+    display: block;
+    padding: 1.2rem 0.5rem;
+    color: #ccc;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.3s, padding-left 0.3s;
+  }
+
+  .work-list a::before {
+    content: "";
+    position: absolute;
+    left: -0.6rem;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--hfx-accent);
+    opacity: 0;
+    transform: translateY(-50%) scale(0.4);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .work-list a:hover {
+    color: #fff;
+    padding-left: 1rem;
+    text-shadow: 0 0 8px rgba(180, 0, 0, 0.7);
+  }
+
+  .work-list a:hover::before {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  .work-list .date {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.5;
+    margin-top: 0.3rem;
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 5rem;
+    font-size: 0.7rem;
+    opacity: 0.35;
+  }
+</style>
+</head>
+<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-room.jpg');">
+
+<div class="hfx-frame index-frame">
+  <h1 class="hfx-reveal">――怪奇ノート――</h1>
+
+  <ul class="work-list hfx-reveal">
+    <li>
+      <a href="works/iwakan/01.html">
+        <span class="title-text">最近、違和感を感じるんです</span>
+        <span class="date">ミステリーホラー・全16章／あとがき</span>
+      </a>
+    </li>
+    <li>
+      <a href="works/sample/index.html">
+        <span class="title-text">サンプル作品「見本」</span>
+        <span class="date">演出テスト用ページ</span>
+      </a>
+    </li>
+    <!--
+      新しい作品を追加するときは、この <li> をコピーして
+      href を works/新しいフォルダ名/index.html に変更してください。
+      詳しい手順は README.md を参照。
+    -->
+  </ul>
+
+  <footer class="hfx-reveal" data-reveal="near">@KazutoYokoyama</footer>
+</div>
+
+<div class="idle-glitch" aria-hidden="true"></div>
+
+<script src="common/horror.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    HorrorFX.scanlines(true);
+    HorrorFX.autoReveal();
+
+    // 作品タイトルにマウスを乗せると、一瞬だけ文字化けする
+    document.querySelectorAll(".work-list .title-text").forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        HorrorFX.glitchText(el, { duration: 500, interval: 45 });
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

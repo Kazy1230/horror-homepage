@@ -1,0 +1,58 @@
+/* このページ固有の見た目調整。共通演出は ../../common/horror.css 側 */
+
+.story {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 10vh 1.5rem 30vh;
+  background: var(--hfx-frame-bg);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 50px 120px -25px rgba(0, 0, 0, 0.95);
+}
+
+.story h1 {
+  font-size: 1.8rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.story p {
+  margin: 0 0 7.2rem;
+  font-size: 1.05rem;
+}
+
+.story .chapter-break {
+  text-align: center;
+  opacity: 0.4;
+  margin: 5rem 0;
+  letter-spacing: 0.5em;
+}
+
+.btn-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0;
+}
+
+.manual-btn {
+  background: none;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 0.6em 1.4em;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex: none;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 6rem;
+  color: #888;
+  font-size: 0.8rem;
+}

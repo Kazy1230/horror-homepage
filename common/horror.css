@@ -1,0 +1,439 @@
+/* ============================================================
+   horror.css — 全ページ共通のホラー演出スタイル
+   このファイルは編集せず、各作品ページの style.css 側で
+   見た目の調整（色・フォント・レイアウト）を行うこと。
+   ============================================================ */
+
+:root {
+  --hfx-bg: #060606;
+  --hfx-fg: #d8d8d8;
+  --hfx-accent: #7a0000;
+  --hfx-flash: #ffffff;
+  --hfx-frame-bg: #030303;
+}
+
+html, body {
+  color: var(--hfx-fg);
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  background: var(--hfx-bg);
+}
+
+body {
+  /* body自身は背景を持たない透明な箱にしておく。
+     不透明な背景を持たせると、painting order 上で
+     負のz-indexを持つ::before/::after（壁紙レイヤー）を覆い隠してしまう。 */
+  background: transparent;
+  font-family: "Yu Mincho", "游明朝", serif;
+  line-height: 1.9;
+  cursor: default;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ---------- 外側の壁紙（フレームの外側に見える広い背景） ----------
+   ページ側で <body style="--hfx-page-photo: url('assets/xxx.jpg')"> を
+   指定すると、その写真がぼかされて壁紙として敷かれる（指定がなければ無地）。 */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -5%;
+  z-index: -3;
+  pointer-events: none;
+  background-image: var(--hfx-page-photo, none);
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px) brightness(1) saturate(0.9);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: rgba(4, 3, 2, 0.12);
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/></svg>"),
+    radial-gradient(ellipse 1300px 850px at 50% 10%, rgba(90, 15, 15, 0.32), transparent 62%),
+    radial-gradient(ellipse 1500px 1000px at 50% 100%, rgba(0, 0, 0, 0.75), transparent 70%);
+}
+
+/* ---------- フレーム（中央の読みやすい「画面」） ---------- */
+
+.hfx-frame {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--hfx-frame-bg);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 50px 120px -25px rgba(0, 0, 0, 0.95);
+}
+
+/* ---------- 入場ゲート（音声再生許可 兼 タイトル） ---------- */
+
+.hfx-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5em;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 1.2s ease;
+}
+
+.hfx-gate.hfx-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 警告表示（ハザードストライプ＋点滅する警告文） */
+.hfx-gate::before,
+.hfx-gate::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  z-index: 3;
+  opacity: 0.4;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--hfx-accent) 0 14px,
+    #000 14px 28px
+  );
+}
+.hfx-gate::before { top: 0; }
+.hfx-gate::after { bottom: 0; }
+
+.hfx-gate__warning {
+  position: relative;
+  z-index: 2;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  color: #c94040;
+  border: 1px solid rgba(180, 30, 30, 0.6);
+  padding: 0.5em 1.4em;
+  animation: hfx-warning-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes hfx-warning-pulse {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 0 rgba(180, 30, 30, 0); }
+  50%      { opacity: 1; box-shadow: 0 0 14px rgba(180, 30, 30, 0.55); }
+}
+
+.hfx-gate__title {
+  position: relative;
+  z-index: 2;
+  font-size: 1.8rem;
+  letter-spacing: 0.2em;
+}
+
+.hfx-gate__note {
+  position: relative;
+  z-index: 2;
+}
+
+/* ドアの中に入っていく演出：ゲート全体がゆっくり迫り、文字は先に消え、
+   最後は真っ暗になって効果音が鳴り終わるのを待つ */
+.hfx-gate__door {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hfx-gate.hfx-entering {
+  cursor: default;
+  animation: hfx-gate-dolly 4s ease-in forwards;
+}
+
+.hfx-gate.hfx-entering .hfx-gate__warning,
+.hfx-gate.hfx-entering .hfx-gate__title,
+.hfx-gate.hfx-entering .hfx-gate__note {
+  animation: hfx-gate-recede 1.6s ease-in forwards;
+}
+
+.hfx-gate.hfx-entering .hfx-gate__door {
+  animation: hfx-door-approach 4s ease-in forwards;
+}
+
+@keyframes hfx-gate-dolly {
+  to { transform: scale(1.08); }
+}
+
+@keyframes hfx-gate-recede {
+  0%   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  100% { opacity: 0; transform: scale(0.9) translateY(-10px); filter: blur(3px); }
+}
+
+@keyframes hfx-door-approach {
+  0%   { opacity: 0; }
+  55%  { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+.hfx-gate__note {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+  animation: hfx-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hfx-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* ---------- フラッシュ（画面全体を一瞬白/色で覆う） ---------- */
+
+.hfx-flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--hfx-flash);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hfx-flash-overlay.hfx-flash-active {
+  animation: hfx-flash-anim var(--hfx-flash-duration, 180ms) ease-out forwards;
+}
+
+@keyframes hfx-flash-anim {
+  0%   { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* ---------- ジャンプスケア（画像がフルスクリーンで一瞬出る） ---------- */
+
+.hfx-jumpscare-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: #000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.hfx-jumpscare-overlay.hfx-active {
+  display: flex;
+  animation: hfx-jumpscare-anim 120ms steps(2, end);
+}
+
+.hfx-jumpscare-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes hfx-jumpscare-anim {
+  0%   { filter: brightness(3) contrast(2); }
+  100% { filter: brightness(1) contrast(1); }
+}
+
+/* ---------- 画面/要素シェイク ---------- */
+
+.hfx-shake {
+  animation: hfx-shake-anim var(--hfx-shake-duration, 400ms) linear;
+}
+
+@keyframes hfx-shake-anim {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-6px, 2px); }
+  20%  { transform: translate(5px, -3px); }
+  30%  { transform: translate(-4px, 4px); }
+  40%  { transform: translate(6px, -1px); }
+  50%  { transform: translate(-3px, -3px); }
+  60%  { transform: translate(4px, 2px); }
+  70%  { transform: translate(-5px, 1px); }
+  80%  { transform: translate(3px, -2px); }
+  90%  { transform: translate(-2px, 3px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- ノイズ/砂嵐オーバーレイ ---------- */
+
+.hfx-noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  animation: hfx-noise-shift 0.2s steps(2) infinite;
+}
+
+.hfx-noise-overlay.hfx-active {
+  opacity: 0.5;
+}
+
+@keyframes hfx-noise-shift {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-5%, 5%); }
+}
+
+/* ---------- 走査線（ブラウン管風） ---------- */
+
+.hfx-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 7000;
+  pointer-events: none;
+  opacity: 0.15;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0px,
+    rgba(0, 0, 0, 0.4) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ---------- 文字化け/グリッチテキスト ---------- */
+
+.hfx-glitch.hfx-glitching {
+  animation: hfx-glitch-shift 80ms steps(2, end) infinite;
+  text-shadow:
+    2px 0 var(--hfx-accent),
+    -2px 0 #0ff;
+}
+
+@keyframes hfx-glitch-shift {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(1px, -1px); }
+  100% { transform: translate(-1px, 1px); }
+}
+
+/* ---------- 静的ノイズの瞬間バースト（TVの砂嵐が一瞬走る） ---------- */
+
+.hfx-static-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 8500;
+  pointer-events: none;
+  opacity: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode: screen;
+}
+
+.hfx-static-burst.hfx-burst-active {
+  animation: hfx-static-flicker var(--hfx-burst-duration, 260ms) steps(6, end) forwards;
+}
+
+@keyframes hfx-static-flicker {
+  0%   { opacity: 0.85; transform: translate(0, 0); }
+  20%  { opacity: 0.6;  transform: translate(-4%, 2%); }
+  40%  { opacity: 0.9;  transform: translate(3%, -3%); }
+  60%  { opacity: 0.4;  transform: translate(-2%, -2%); }
+  80%  { opacity: 0.7;  transform: translate(2%, 3%); }
+  100% { opacity: 0;    transform: translate(0, 0); }
+}
+
+/* ---------- ハートビート（不穏な鼓動でビネットが明滅） ---------- */
+
+.hfx-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 6500;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(120, 0, 0, 0.55) 100%);
+  transition: opacity 0.35s ease;
+}
+
+.hfx-vignette.hfx-active {
+  animation: hfx-heartbeat-pulse var(--hfx-heartbeat-duration, 0.9s) ease-in-out infinite;
+}
+
+@keyframes hfx-heartbeat-pulse {
+  0%, 100% { opacity: 0.15; }
+  15%      { opacity: 0.55; }
+  30%      { opacity: 0.2; }
+  45%      { opacity: 0.6; }
+  70%      { opacity: 0.15; }
+}
+
+/* ---------- 囁き（画面の隅に一瞬だけ現れる文字） ---------- */
+
+.hfx-whisper {
+  position: fixed;
+  z-index: 9200;
+  pointer-events: none;
+  color: rgba(200, 190, 185, 0.5);
+  font-family: "Yu Mincho", "游明朝", serif;
+  letter-spacing: 0.3em;
+  filter: blur(0.3px);
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.hfx-whisper.hfx-whisper-active {
+  animation: hfx-whisper-fade var(--hfx-whisper-duration, 1400ms) ease-in-out forwards;
+}
+
+@keyframes hfx-whisper-fade {
+  0%   { opacity: 0; }
+  15%  { opacity: 0.75; }
+  70%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+/* ---------- ひび割れ（画面が一瞬砕けたように見える） ---------- */
+
+.hfx-crack-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9100;
+  pointer-events: none;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hfx-crack-overlay svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hfx-crack-overlay.hfx-crack-active {
+  animation: hfx-crack-flash var(--hfx-crack-duration, 500ms) ease-out forwards;
+}
+
+@keyframes hfx-crack-flash {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  25%  { opacity: 0.75; }
+  40%  { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+/* ---------- スクロールで現れるテキスト演出 ---------- */
+
+.hfx-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.hfx-reveal.hfx-in {
+  opacity: 1;
+  transform: translateY(0);
+}

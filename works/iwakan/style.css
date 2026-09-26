@@ -1,0 +1,98 @@
+/* 「違和感を感じるんです」ページ固有の見た目調整。共通演出は ../../common/horror.css 側 */
+
+.story {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 10vh 1.5rem 30vh;
+  background: var(--hfx-frame-bg);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 50px 120px -25px rgba(0, 0, 0, 0.95);
+}
+
+.story .work-title {
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: #777;
+  margin: 0 0 1.5rem;
+}
+
+.story h1 {
+  font-size: 1.7rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.story p {
+  margin: 0 0 7.2rem;
+  font-size: 1.05rem;
+}
+
+.story .quote-line {
+  text-align: center;
+  font-size: 1.15rem;
+  margin: 6.4rem 0 8rem;
+  color: #eee;
+}
+
+.btn-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0;
+}
+
+.manual-btn {
+  background: none;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 0.6em 1.4em;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex: none;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  padding-top: 2rem;
+  margin-top: 3rem;
+  border-top: 1px solid #2a2a2a;
+}
+
+.chapter-nav .prev.is-disabled,
+.chapter-nav .next.is-disabled {
+  color: #444;
+  pointer-events: none;
+}
+
+.story .end-mark {
+  text-align: center;
+  color: #777;
+  letter-spacing: 0.15em;
+  margin-top: 3rem;
+}
+
+.chapter-nav a {
+  color: #999;
+  text-decoration: none;
+}
+
+.chapter-nav a:hover {
+  color: #fff;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 5rem;
+  color: #666;
+  font-size: 0.78rem;
+}
