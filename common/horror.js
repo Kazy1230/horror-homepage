@@ -205,8 +205,13 @@
 
   /* ---------------- BGM（ループ再生、フェードイン/アウト） ---------------- */
   let bgmAudio = null;
+  const BGM_SRC_KEY = "hfx-bgm-src";
+  const BGM_POSITION_KEY = "hfx-bgm-position";
 
-  function playBGM(src, { volume = 0.3, fadeMs = 2500, loop = true } = {}) {
+  // resume: true（既定）の場合、sessionStorageに保存しておいた前回の再生位置から
+  // 再開する。章ごとにページが丸ごと切り替わる作りのため、これがないと
+  // 章を移動するたびにBGMが0秒から鳴り直してしまう。
+  function playBGM(src, { volume = 0.3, fadeMs = 2500, loop = true, resume = true } = {}) {
     if (bgmAudio) {
       bgmAudio.pause();
       bgmAudio = null;
@@ -215,6 +220,36 @@
     audio.loop = loop;
     audio.volume = 0;
     bgmAudio = audio;
+
+    if (resume) {
+      try {
+        const savedSrc = sessionStorage.getItem(BGM_SRC_KEY);
+        const savedPos = parseFloat(sessionStorage.getItem(BGM_POSITION_KEY));
+        if (savedSrc === src && Number.isFinite(savedPos) && savedPos > 0) {
+          audio.addEventListener(
+            "loadedmetadata",
+            () => {
+              if (Number.isFinite(audio.duration) && savedPos < audio.duration) {
+                audio.currentTime = savedPos;
+              }
+            },
+            { once: true }
+          );
+        }
+      } catch (e) {
+        // sessionStorageが使えない環境では、素直に最初から再生する
+      }
+
+      audio.addEventListener("timeupdate", () => {
+        try {
+          sessionStorage.setItem(BGM_SRC_KEY, src);
+          sessionStorage.setItem(BGM_POSITION_KEY, String(audio.currentTime));
+        } catch (e) {
+          // 無視
+        }
+      });
+    }
+
     audio.play().catch((err) => {
       console.warn("[HorrorFX] BGM playback blocked (need user interaction first):", err);
     });
