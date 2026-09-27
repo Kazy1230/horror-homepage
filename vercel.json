@@ -1,0 +1,12 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.kaiki-note.com" }],
+      "destination": "https://kaiki-note.com/:path*",
+      "permanent": true
+    }
+  ]
+}
