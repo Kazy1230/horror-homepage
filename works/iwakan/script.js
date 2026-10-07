@@ -197,7 +197,7 @@ const scenes = {
     CX.Ceiling.show({ "has-hatch": true, "is-open": true });
     const sweep = CX.Ceiling.sweep(7000);
     await sleep(4300);
-    CX.eyesIn("hatch", { ms: 3400, opacity: 0.22 }); // 光の奥で、気のせいかと思うほど薄く、何かが光る
+    CX.eyesIn("hatch", { ms: 4200, opacity: 0.09 }); // 光の奥で、気のせいかと思うほど薄く、何かが光る
     await sweep;
   },
   "c7-close"() {
@@ -206,11 +206,10 @@ const scenes = {
   },
   async "c7-eyes"() {
     CX.Ceiling.show({ "has-hatch": true, "is-open": true });
-    HorrorFX.heartbeat({ duration: 4200, bpm: 80, volume: 0.24 });
     await sleep(2400);
-    creakAbove({ vol: 0.4, close: true, delay: 600, pan: 0 });
-    CX.eyesIn("hatch", { ms: 5200 });
-    await sleep(6400);
+    creakAbove({ vol: 0.18, delay: 1200, pan: 0.2 });
+    CX.eyesIn("hatch", { ms: 6500 });
+    await sleep(9000);
     CX.Ceiling.set({ "is-open": false });
   },
 
@@ -391,11 +390,11 @@ const scenes = {
   },
   async "c12-everywhere"() {
     HorrorFX.crackFlash({ duration: 500 });
-    CX.eyes({ x: "50%", y: "9%", ms: 3600, blinks: 0, opacity: 0.32, fade: 1800, blur: 1, width: 150 });
+    CX.eyes({ x: "50%", y: "9%", ms: 5000, blinks: 0, opacity: 0.14, fade: 3200, blur: 1.6, width: 100 });
     await sleep(700);
-    CX.eyes({ x: "6%", y: "48%", ms: 3200, blinks: 0, opacity: 0.28, fade: 1800, blur: 1, width: 140 });
+    CX.eyes({ x: "6%", y: "48%", ms: 4500, blinks: 0, opacity: 0.12, fade: 3200, blur: 1.6, width: 95 });
     await sleep(600);
-    CX.eyes({ x: "93%", y: "64%", ms: 3000, blinks: 0, opacity: 0.28, fade: 1800, blur: 1, width: 140 });
+    CX.eyes({ x: "93%", y: "64%", ms: 4500, blinks: 0, opacity: 0.12, fade: 3200, blur: 1.6, width: 95 });
   },
   "c12-dial"() {
     S("dial", { volume: 0.4, wet: 0.3, offset: 0.4, duration: 9 });
@@ -582,12 +581,12 @@ document.addEventListener("DOMContentLoaded", () => {
       HorrorFX.flash({ color: "#ffffff", duration: 150 });
       HorrorFX.shake(document.body, { duration: 300, sound: false });
       if (n >= 2) creakAbove({ vol: 0.12 + Math.min(n, 8) * 0.07, delay: 2200 + rand(0, 800) });
-      if (n === 4) CX.eyes({ x: "50%", y: "10%", ms: 3200, blinks: 0, opacity: 0.3, fade: 1800, blur: 1, width: 150 });
+      if (n === 4) CX.eyes({ x: "50%", y: "10%", ms: 5000, blinks: 0, opacity: 0.13, fade: 3200, blur: 1.6, width: 100 });
       if (n === 6) {
         bell.classList.add("is-wrong");
         HorrorFX.whisper("鳴らさないで");
       }
-      if (n >= 8 && n % 2 === 0) CX.eyes({ x: rand(15, 85) + "%", y: rand(10, 80) + "%", ms: 2800, blinks: 0, opacity: 0.25, fade: 1600, blur: 1, width: 130 });
+      if (n >= 8 && n % 2 === 0) CX.eyes({ x: rand(15, 85) + "%", y: rand(10, 80) + "%", ms: 4500, blinks: 0, opacity: 0.11, fade: 3200, blur: 1.6, width: 95 });
     });
   }
 });

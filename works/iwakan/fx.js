@@ -337,7 +337,7 @@
   function eyesIn(kind, opts = {}) {
     const c = Ceiling.center(kind);
     // 天井の暗がりの目は、さりげなく：小さく、薄く、ゆっくり浮かんでゆっくり消える（まばたきもしない）
-    return eyes({ x: c.x + "px", y: c.y + "px", width: Math.round(c.w * 0.62), opacity: 0.3, fade: 2200, blur: 1.2, blinks: 0, ...opts });
+    return eyes({ x: c.x + "px", y: c.y + "px", width: Math.round(c.w * 0.42), opacity: 0.13, fade: 3600, blur: 1.6, blinks: 0, ...opts });
   }
 
   window.CX = { HUD, Cam, Ceiling, Lids, eyes, eyesIn, cold, stale, wait };
