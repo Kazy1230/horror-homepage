@@ -91,11 +91,11 @@
 - scare-hair.jpg — Pexels photo 7342412
 - scare-doorway.jpg — Pexels photo 14173576
 
-## 防犯カメラ映像・天井・目・人影に使った写真（assets/cam/ と common/shadow-woman.png。いずれも Pexels・加工して使用）
-- 寝室（第10〜11章）：photo 6943996（窓際の男）／photo 8337691（ぼやけた人影）／photo 33578582（手）／photo 4058697（冷蔵庫の前の人）
+## 防犯カメラ映像・天井・目・人影に使った写真（assets/cam/ と common/shadow-man.png。いずれも Pexels・加工して使用）
+- 寝室（第10〜11章）：photo 6943996（窓際の男）／photo 6187451（フードの男）／photo 33578582（手）／photo 10379533（冷蔵庫の前の男）
 - 新居の寝室（あとがき）：photo 6943990
 - 玄関（第3・5章）：photo 11570561
 - 天井・シミ：photo 14032089
-- 暗がりの目：photo 18870805
-- 人影（common/shadow-woman.png）：photo 16310042
-- こちらを向く顔：scare-hair.jpg（photo 7342412）を合成
+- 暗がりの目：photo 14660901
+- 人影（common/shadow-man.png）：photo 10497778
+- ジャンプスケア（scare-man.jpg）：photo 12947855

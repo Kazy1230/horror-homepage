@@ -57,7 +57,7 @@
   const FRAME_DIR = "assets/cam/cam-";
   const FRAMES = [
     "room-closed", "room-ajar", "room-open", "room-arm", "room-ghost", "room-ghost2",
-    "room-stand", "room-stare", "room-empty", "kitchen", "genkan", "genkan-ghost", "new-empty", "new-figure",
+    "room-stand", "room-stare", "room-empty", "kitchen", "genkan", "genkan-ghost", "new-empty",
   ];
 
   const Cam = {
@@ -330,28 +330,11 @@
     if (on && ms) setTimeout(() => document.body.classList.remove("cx-stale"), ms);
   }
 
-  /* ---------------- 最後の黒画面と一言 ---------------- */
-  const Last = {
-    el: null,
-    show(text) {
-      if (!this.el) this.el = div("cx-last", "<span></span>");
-      this.el.querySelector("span").textContent = text;
-      void this.el.offsetWidth;
-      this.el.classList.add("is-on");
-      setTimeout(() => this.el.classList.add("is-text"), 700);
-    },
-    hide(ms = 1200) {
-      if (!this.el) return;
-      this.el.style.transition = "opacity " + ms + "ms ease";
-      this.el.classList.remove("is-on", "is-text");
-    },
-  };
-
   // 点検口／通気口の暗がりの中に、目を浮かべる
   function eyesIn(kind, opts = {}) {
     const c = Ceiling.center(kind);
     return eyes({ x: c.x + "px", y: c.y + "px", width: Math.round(c.w * 0.92), ...opts });
   }
 
-  window.CX = { HUD, Cam, Ceiling, Lids, Last, eyes, eyesIn, cold, stale, wait };
+  window.CX = { HUD, Cam, Ceiling, Lids, eyes, eyesIn, cold, stale, wait };
 })();

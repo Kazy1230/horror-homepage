@@ -588,8 +588,10 @@ body.hfx-silent .hfx-frame {
   animation: hfx-shadow-sway 4.2s ease-in-out infinite, hfx-shadow-flicker 2.6s steps(1, end) infinite;
 }
 
-.hfx-shadow-figure:nth-child(2) {
-  transform: translateX(-50%) scaleX(-1) rotate(var(--lean, 0deg));
+/* 男の人影（フードつきのコートの男） */
+.hfx-shadow-figure--man {
+  width: calc(var(--h, 46vh) * 0.451);
+  background-image: url("shadow-man.png");
 }
 
 @keyframes hfx-shadow-sway {

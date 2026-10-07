@@ -254,7 +254,7 @@ const scenes = {
 
   /* 第九章 */
   "c9-inside"() {
-    HorrorFX.shadowFigures({ figures: [{ x: 80, h: 46, lean: 3 }], duration: 3400, fadeIn: 1500 });
+    HorrorFX.shadowFigures({ kind: "man", figures: [{ x: 80, h: 46, lean: 3 }], duration: 3400, fadeIn: 1500 });
     HorrorFX.heartbeat({ duration: 3400, bpm: 88, volume: 0.32 });
     creakAbove({ vol: 0.35, delay: 900 });
   },
@@ -322,7 +322,7 @@ const scenes = {
   async "c11-crawl"() {
     CX.Cam.frame("room-ghost", { jolt: true });
     await sleep(1400);
-    HorrorFX.jumpscare({ image: A + "scare-hair.jpg", sound: false, duration: 650 });
+    HorrorFX.jumpscare({ image: A + "scare-man.jpg", sound: false, duration: 650 });
     S("scare-b", { volume: 0.9, wet: 0.1, duration: 3 });
     HorrorFX.haptic([120, 40, 300]);
     await sleep(900);
@@ -429,7 +429,7 @@ const scenes = {
     HorrorFX.heartbeat({ duration: 3600, bpm: 74, volume: 0.3 });
   },
   "c14-behind"() {
-    HorrorFX.shadowFigures({ figures: [{ x: 18, h: 52, lean: -3 }], duration: 3600, fadeIn: 1800 });
+    HorrorFX.shadowFigures({ kind: "man", figures: [{ x: 18, h: 52, lean: -3 }], duration: 3600, fadeIn: 1800 });
     S("breath", { volume: 0.3, pan: -0.8, wet: 0.4, lowpass: 1500, offset: 0.8, duration: 4 });
   },
 
@@ -471,37 +471,7 @@ const scenes = {
     HorrorFX.footsteps({ kind: "light", steps: 6, interval: 540, volume: 0.35, fromVolume: 0.12, toVolume: 0.4, pan: -0.25, muffled: true, creak: 0.1 });
     await sleep(3400);
     HorrorFX.silence({ duration: 2800, visual: false, restoreMs: 2500 });
-    HorrorFX.shadowFigures({ figures: [{ x: 90, h: 34, lean: 2 }], duration: 2600, fadeIn: 1400 });
-  },
-  async "ae-finale"() {
-    HorrorFX.silence({ restore: false, visual: true });
-    camReady();
-    CX.Cam.show({ big: true, frame: "new-empty", label: "CAM 01 新居", clock: null });
-    CX.HUD.on();
-    S("beep", { volume: 0.5, wet: 0 });
-    await sleep(4200);
-    // 映像が一瞬途切れ、戻ったときには——ベッドの足元に、立っている
-    CX.Cam.cut(140);
-    CX.Cam.frame("new-figure", { jolt: true });
-    HorrorFX.staticBurst({ duration: 220, volume: 0.45 });
-    CX.HUD.glitch();
-    await sleep(4000);
-    CX.Cam.zoom({ x: 88, y: 44, scale: 2.6, ms: 5200 }); // 右の壁際に立つ、長い服の人影へ寄っていく
-    HorrorFX.heartbeat({ duration: 5200, bpm: 96, volume: 0.35 });
-    await sleep(5400);
-    HorrorFX.jumpscare({ image: A + "scare-doorway.jpg", sound: false, duration: 900 });
-    S("scare-b", { volume: 1, wet: 0.1 });
-    HorrorFX.shake(document.body, { duration: 450, sound: false });
-    HorrorFX.haptic([200, 60, 420]);
-    await sleep(500);
-    CX.Cam.hide();
-    HorrorFX.staticBurst({ duration: 500, volume: 0.6 });
-    await sleep(900);
-    CX.Last.show("まだ、みてる");
-    S("whisper-b", { volume: 0.85, offset: 1.6, duration: 5.5, wet: 0.45, pan: 0.2 });
-    await sleep(6200);
-    CX.Last.hide(1800);
-    HorrorFX.unsilence({ restoreMs: 6000 });
+    HorrorFX.shadowFigures({ kind: "man", figures: [{ x: 90, h: 34, lean: 2 }], duration: 2600, fadeIn: 1400 });
   },
 };
 

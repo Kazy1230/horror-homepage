@@ -1104,7 +1104,7 @@
   }
 
   /* ---------------- 人影（画面の端に、青白い人の形がぼんやり立つ） ---------------- */
-  function shadowFigures({ figures, duration = 2600, fadeIn = 900 } = {}) {
+  function shadowFigures({ figures, duration = 2600, fadeIn = 900, kind = "woman" } = {}) {
     const list = figures || [
       { x: 36, h: 52, lean: -2 },
       { x: 62, h: 42, lean: 4 },
@@ -1114,7 +1114,7 @@
     root.style.setProperty("--hfx-shadow-in", fadeIn + "ms");
     list.forEach((f, i) => {
       const el = document.createElement("div");
-      el.className = "hfx-shadow-figure";
+      el.className = "hfx-shadow-figure" + (kind === "man" ? " hfx-shadow-figure--man" : "");
       el.style.setProperty("--x", f.x + "%");
       el.style.setProperty("--h", f.h + "vh");
       el.style.setProperty("--lean", (f.lean || 0) + "deg");

@@ -337,8 +337,8 @@
   z-index: 6800;
   pointer-events: none;
   width: var(--ew);
-  aspect-ratio: 480 / 222;
-  margin: calc(var(--ew) * -0.231) 0 0 calc(var(--ew) * -0.5);
+  aspect-ratio: 480 / 129;
+  margin: calc(var(--ew) * -0.134) 0 0 calc(var(--ew) * -0.5);
   background: url("assets/cam/eyes.jpg") center / cover no-repeat;
   mix-blend-mode: screen;
   opacity: 0;
@@ -408,30 +408,6 @@ body.cx-cold .cx-cold-ov { opacity: 1; }
 .manual-btn { transition: border-color 0.5s, color 0.5s, box-shadow 0.5s; }
 .manual-btn:hover { border-color: #888; color: #ddd; }
 .manual-btn.is-wrong { border-color: #8a2020; color: #c46060; box-shadow: 0 0 14px rgba(160, 30, 30, 0.35); }
-
-/* ---------- 最後の囁き ---------- */
-.cx-last {
-  position: fixed;
-  inset: 0;
-  z-index: 8800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  background: #000;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.cx-last.is-on { opacity: 1; }
-.cx-last span {
-  font-size: clamp(1.8rem, 7vw, 3.4rem);
-  letter-spacing: 0.3em;
-  color: #d9d4c8;
-  text-shadow: 0 0 22px rgba(255, 255, 255, 0.25);
-  opacity: 0;
-  transition: opacity 3.6s ease;
-}
-.cx-last.is-text span { opacity: 0.9; }
 
 @media (max-width: 600px) {
   .cx-cam:not(.is-big) { width: min(250px, 66vw); right: 8px; bottom: 8px; }
