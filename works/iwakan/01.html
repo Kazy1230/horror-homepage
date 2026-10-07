@@ -6,8 +6,9 @@
 <title>第一章：些細な違和感 ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body data-entry-gate="true" style="--hfx-page-photo: url('/works/iwakan/assets/bg-room.jpg');">
+<body data-entry-gate="true" data-bgm="drone" data-hum="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-night-bed.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
@@ -17,7 +18,7 @@
 
   <p class="hfx-reveal">平日は、朝六時半に起きて、シャワーを浴びて、簡単な朝食を済ませてから、七時半には家を出る。帰りは、仕事の忙しさによってまちまちだけど、大体、夜の八時から九時の間には、部屋に戻ってくる。この三年間、ずっと同じリズムで、変わらない日々を送ってきた。</p>
 
-  <p class="hfx-reveal glitch-target">違和感に気づいたのは、ある月曜日の朝だった。出勤前、冷蔵庫を開けたら、買ったばかりのはずの牛乳パックが、思っていたより、軽かった。手に持った瞬間の、あの、わずかな軽さの違い。毎朝の習慣で、なんとなく体が覚えている重さと、微妙にずれていた。</p>
+  <p class="hfx-reveal glitch-target" data-scene="c1-fridge-stop">違和感に気づいたのは、ある月曜日の朝だった。出勤前、冷蔵庫を開けたら、買ったばかりのはずの牛乳パックが、思っていたより、軽かった。手に持った瞬間の、あの、わずかな軽さの違い。毎朝の習慣で、なんとなく体が覚えている重さと、微妙にずれていた。</p>
 
   <p class="hfx-reveal">自分が、寝ぼけて飲んだのかもしれない。最初は、そう思って、深く気にしなかった。疲れが溜まっていると、たまに、記憶があいまいになることもある。</p>
 
@@ -27,11 +28,11 @@
 
   <p class="hfx-reveal">金曜の夜、飲み会の帰りに、少し酔っぱらった状態で帰宅した。玄関の電気をつけて、そのままキッチンに向かうと、シンクのあたりが、うっすらと濡れていることに気づいた。</p>
 
-  <p class="quote-line hfx-reveal scare-trigger" data-fx="drip">「あれ、水漏れかな」</p>
+  <p class="quote-line hfx-reveal scene-trigger" data-scene="c1-drip">「あれ、水漏れかな」</p>
 
   <p class="hfx-reveal">蛇口を確認したけれど、特に、異常は見当たらなかった。酔いのせいで、自分が、何か、思い出せないことをしたのかもしれない。そう思って、その日は、深く考えずに、そのまま、布団に倒れ込むように眠ってしまった。</p>
 
-  <p class="hfx-reveal">その週はとにかく、いろんなことに敏感になりすぎていたのかもしれない。仕事のストレスもあったし、季節の変わり目で、体調も、あまり良くなかった。だから、こういう些細な違和感も、全部、気のせいの延長線上にあるものだと、無理やり自分を納得させていた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c1-last">その週はとにかく、いろんなことに敏感になりすぎていたのかもしれない。仕事のストレスもあったし、季節の変わり目で、体調も、あまり良くなかった。だから、こういう些細な違和感も、全部、気のせいの延長線上にあるものだと、無理やり自分を納得させていた。</p>
 
   <div class="btn-row hfx-reveal" data-reveal="near">
     <button id="manual-scare-button" class="manual-btn">鈴を鳴らす</button>
@@ -46,6 +47,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

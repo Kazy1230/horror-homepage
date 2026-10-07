@@ -6,20 +6,21 @@
 <title>あとがき ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-corridor-figure.jpg');">
+<body data-bgm="dementia" data-rec="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-attic.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
   <h1 class="hfx-reveal">あとがき</h1>
 
-  <p class="hfx-reveal">新しい部屋には、天井裏に繋がるようなスペースが、一切ないことを、契約前に、何度も、確認した。それでも、念のため、室内カメラは、引っ越した後も、そのまま、使い続けている。もう、必要ないと分かっていても、どうしても、電源を切る気にはなれなかった。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="ae-cam">新しい部屋には、天井裏に繋がるようなスペースが、一切ないことを、契約前に、何度も、確認した。それでも、念のため、室内カメラは、引っ越した後も、そのまま、使い続けている。もう、必要ないと分かっていても、どうしても、電源を切る気にはなれなかった。</p>
 
   <p class="hfx-reveal">事件は、一応の決着を迎えた。加害者の男は、逮捕され、現在、裁判にかけられている。判決が出れば、また、連絡が来ることになっている。</p>
 
   <p class="hfx-reveal">それでも、時々、ふと、あのノートのことを、思い出すことがある。</p>
 
-  <p class="hfx-reveal glitch-target">最初の記録がつけられた日付は、自分が、最初に牛乳の減りに気づいた日よりも、さらに、一週間ほど前だった。あのノートには、その、潜伏を始めたばかりの時期の記述にも関わらず、こちらの生活習慣について、驚くほど、詳細な内容が、書かれていたという。何時に家を出て、何を買って帰ってくるか、休日は、どこで、何をして過ごすか。まるで、あの部屋に、潜伏を始める、ずっと前から、こちらのことを、すでに、知っていたかのような、そんな精度だ。</p>
+  <p class="hfx-reveal glitch-target" data-scene="ae-know">最初の記録がつけられた日付は、自分が、最初に牛乳の減りに気づいた日よりも、さらに、一週間ほど前だった。あのノートには、その、潜伏を始めたばかりの時期の記述にも関わらず、こちらの生活習慣について、驚くほど、詳細な内容が、書かれていたという。何時に家を出て、何を買って帰ってくるか、休日は、どこで、何をして過ごすか。まるで、あの部屋に、潜伏を始める、ずっと前から、こちらのことを、すでに、知っていたかのような、そんな精度だ。</p>
 
   <p class="hfx-reveal">警察に、その点について、改めて、尋ねてみたことがある。</p>
 
@@ -35,9 +36,9 @@
 
   <p class="hfx-reveal">新しい生活は、今のところ、表面上は、平穏に過ぎている。会社にも、いつも通り通ってるし、友人とも、以前と変わらず会っている。</p>
 
-  <p class="hfx-reveal scare-trigger" data-fx="static">ただ、最近、通勤の途中、ふと誰かの視線を感じることがある。振り返っても、そこには誰もいない。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="ae-gaze">ただ、最近、通勤の途中、ふと誰かの視線を感じることがある。振り返っても、そこには誰もいない。</p>
 
-  <p class="hfx-reveal whisper-trigger" data-whisper="まだ、みてる">きっとこれも、気にしすぎの始まりなのかもしれない。</p>
+  <p class="hfx-reveal scene-trigger" data-whisper="まだ、みてる" data-scene="ae-finale">きっとこれも、気にしすぎの始まりなのかもしれない。</p>
 
   <p class="hfx-reveal end-mark">―― 最近、違和感を感じるんです ―― 完</p>
 
@@ -54,6 +55,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

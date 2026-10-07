@@ -6,8 +6,9 @@
 <title>第九章：警察への相談 ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-hallway.jpg');">
+<body data-bgm="pressure" data-rec="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-police-night.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
@@ -29,7 +30,7 @@
 
   <p class="hfx-reveal">その一言が、頭の中に、重く、残った。今まで、玄関にさえ気をつけていれば、大丈夫だと、どこかで、思い込んでいた。</p>
 
-  <p class="hfx-reveal scare-trigger" data-fx="heartbeat">でも、もし、すでに、部屋の「中」に、何かが、入り込んでいるのだとしたら――。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c9-inside">でも、もし、すでに、部屋の「中」に、何かが、入り込んでいるのだとしたら――。</p>
 
   <div class="btn-row hfx-reveal" data-reveal="near">
     <button id="manual-scare-button" class="manual-btn">鈴を鳴らす</button>
@@ -44,6 +45,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

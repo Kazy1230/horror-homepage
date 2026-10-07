@@ -6,8 +6,9 @@
 <title>第十三章：屋根裏の生活痕 ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-corridor-figure.jpg');">
+<body data-bgm="dread" data-rec="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-attic.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
@@ -21,13 +22,13 @@
 
   <p class="hfx-reveal">その日のうちに、複数の警察官と一緒に、部屋に戻ることになった。自分の足で、あの部屋の玄関をくぐるのは、恐ろしかったけれど、立ち会わなければ、話が進まない。警察官たちに囲まれているという事実だけが、かろうじて、足を前に進ませてくれた。</p>
 
-  <p class="hfx-reveal">クローゼットの扉が、慎重に開けられ、天井の点検口へと、懐中電灯の光が、向けられた。以前、不動産会社の業者が確認したときとは違い、今度は、もっと奥まで、本格的に、調べが進められた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c13-hatch">クローゼットの扉が、慎重に開けられ、天井の点検口へと、懐中電灯の光が、向けられた。以前、不動産会社の業者が確認したときとは違い、今度は、もっと奥まで、本格的に、調べが進められた。</p>
 
-  <p class="hfx-reveal glitch-target">点検口の奥、配管の隙間をすり抜けた先に、これまで、誰も気づかなかった、隠されたスペースがあった。大人が一人、体を折りたたんで、なんとか、横になれるくらいの、狭い空間。断熱材が、周囲を覆っていて、外からの音を、ある程度、遮断できる作りになっていたらしい。</p>
+  <p class="hfx-reveal glitch-target" data-scene="c13-space">点検口の奥、配管の隙間をすり抜けた先に、これまで、誰も気づかなかった、隠されたスペースがあった。大人が一人、体を折りたたんで、なんとか、横になれるくらいの、狭い空間。断熱材が、周囲を覆っていて、外からの音を、ある程度、遮断できる作りになっていたらしい。</p>
 
-  <p class="hfx-reveal scare-trigger">そこに、古びた寝袋が一つ、敷かれていた。周りには、コンビニのおにぎりの包装や、カップ麺の容器が、いくつも、積み重なっている。饐えた臭いが、点検口から、ゆっくりと、漏れ出してきた。あの日、部屋の中で感じた、あの異質な匂いの正体は、これだったのだと、ようやく、理解した。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c13-bag">そこに、古びた寝袋が一つ、敷かれていた。周りには、コンビニのおにぎりの包装や、カップ麺の容器が、いくつも、積み重なっている。饐えた臭いが、点検口から、ゆっくりと、漏れ出してきた。あの日、部屋の中で感じた、あの異質な匂いの正体は、これだったのだと、ようやく、理解した。</p>
 
-  <p class="hfx-reveal whisper-trigger" data-whisper="ここに、いた">寝袋のそばに、小さな、使い古されたノートが一冊、置かれていた。警察官が、手袋をはめた手で、そっと、それを取り上げた。</p>
+  <p class="hfx-reveal whisper-trigger" data-whisper="ここに、いた" data-scene="c13-notebook">寝袋のそばに、小さな、使い古されたノートが一冊、置かれていた。警察官が、手袋をはめた手で、そっと、それを取り上げた。</p>
 
   <div class="btn-row hfx-reveal" data-reveal="near">
     <button id="manual-scare-button" class="manual-btn">鈴を鳴らす</button>
@@ -42,6 +43,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

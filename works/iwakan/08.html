@@ -6,8 +6,9 @@
 <title>第八章：夜の物音 ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-closet.jpg');">
+<body data-bgm="psycho" data-rec="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-roof-beams.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
@@ -17,19 +18,19 @@
 
   <p class="hfx-reveal">いつも通り、日付が変わる少し前に、布団に入る。照明を落とし、スマホを少し触ってから、目を閉じる。うとうとと、眠りに落ちかけた、その瞬間だった。</p>
 
-  <p class="hfx-reveal glitch-target">天井の方から、かすかに、何かが軋むような音が、聞こえた。</p>
+  <p class="hfx-reveal glitch-target" data-scene="c8-first">天井の方から、かすかに、何かが軋むような音が、聞こえた。</p>
 
-  <p class="hfx-reveal">「みしっ」という、木材が、わずかに、重みでたわむような音。古いマンションだから、気温の変化で、建材が伸び縮みして、そういう音がすることもあると聞いたことがある。自分に、そう言い聞かせて、また、目を閉じた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c8-mishi">「みしっ」という、木材が、わずかに、重みでたわむような音。古いマンションだから、気温の変化で、建材が伸び縮みして、そういう音がすることもあると聞いたことがある。自分に、そう言い聞かせて、また、目を閉じた。</p>
 
-  <p class="hfx-reveal">しばらくして、また、同じような音が、聞こえた。「みしっ」今度は、さっきより、少しだけ、はっきりと。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c8-louder">しばらくして、また、同じような音が、聞こえた。「みしっ」今度は、さっきより、少しだけ、はっきりと。</p>
 
-  <p class="hfx-reveal">そのまま、じっと、天井の方に、意識を集中させてみる。一度、気になり始めると、もう、眠るどころではなくなった。布団の中に顔を隠し、耳だけを澄ませて、何時間も、じっとしていた。物音は、思い出したように、みし、みしっと、不規則な間隔で、続いた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c8-hours">そのまま、じっと、天井の方に、意識を集中させてみる。一度、気になり始めると、もう、眠るどころではなくなった。布団の中に顔を隠し、耳だけを澄ませて、何時間も、じっとしていた。物音は、思い出したように、みし、みしっと、不規則な間隔で、続いた。</p>
 
   <p class="hfx-reveal">朝方、まともに眠れないまま、出勤の時間が来てしまった。会社でも、頭がぼんやりして、集中力が、続かなかった。</p>
 
-  <p class="hfx-reveal scare-trigger" data-fx="crack">そんな日を繰り返して数日、気づいたことがある。音は、決まって私が完全に寝入る、ほんの少し手前のタイミングで、聞こえてくる。まるで、こちらが、眠りに落ちるのを、じっと、待っているかのように。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c8-drowse">そんな日を繰り返して数日、気づいたことがある。音は、決まって私が完全に寝入る、ほんの少し手前のタイミングで、聞こえてくる。まるで、こちらが、眠りに落ちるのを、じっと、待っているかのように。</p>
 
-  <p class="hfx-reveal">今夜も、また、同じように、天井から、あの音が、聞こえてくるのだろうか。考えるだけで、家に帰ることが、少しずつ、億劫になっていった。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c8-dread">今夜も、また、同じように、天井から、あの音が、聞こえてくるのだろうか。考えるだけで、家に帰ることが、少しずつ、億劫になっていった。</p>
 
   <div class="btn-row hfx-reveal" data-reveal="near">
     <button id="manual-scare-button" class="manual-btn">鈴を鳴らす</button>
@@ -44,6 +45,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

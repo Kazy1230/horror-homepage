@@ -1,0 +1,568 @@
+/* ============================================================
+   「天井裏の誰か」を描く追加演出
+   （防犯カメラ／天井／目／まぶた／ノート）。fx.js とセットで使う。
+   ============================================================ */
+
+.story { color: #d9d6cf; }
+.story p.quote-line { color: #ece8df; }
+
+/* ---------- 入場ゲート（防犯カメラの再生画面） ---------- */
+.hfx-gate.cx-gate {
+  background: #020403;
+  color: #c9d8c8;
+}
+.hfx-gate.cx-gate::before {
+  inset: 18px;
+  height: auto;
+  opacity: 0.55;
+  background:
+    linear-gradient(#9fdca8, #9fdca8) top left / 26px 2px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) top left / 2px 26px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) top right / 26px 2px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) top right / 2px 26px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) bottom left / 26px 2px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) bottom left / 2px 26px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) bottom right / 26px 2px no-repeat,
+    linear-gradient(#9fdca8, #9fdca8) bottom right / 2px 26px no-repeat;
+}
+.hfx-gate.cx-gate::after {
+  inset: 0;
+  height: auto;
+  opacity: 0.16;
+  background: repeating-linear-gradient(to bottom, rgba(150, 255, 170, 0.5) 0 1px, transparent 1px 3px);
+  animation: cx-gate-roll 7s linear infinite;
+}
+@keyframes cx-gate-roll {
+  from { background-position-y: 0; }
+  to   { background-position-y: 60px; }
+}
+.cx-gate__rec {
+  position: absolute;
+  top: 34px;
+  left: 38px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font: 600 12px/1 "Courier New", monospace;
+  letter-spacing: 0.12em;
+  color: #cfe9d2;
+}
+.cx-gate__rec i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e5231f;
+  box-shadow: 0 0 9px #e5231f;
+  animation: cx-blink 1.2s steps(1, end) infinite;
+}
+.cx-gate__cam {
+  position: absolute;
+  top: 34px;
+  right: 38px;
+  z-index: 4;
+  font: 600 12px/1 "Courier New", monospace;
+  letter-spacing: 0.12em;
+  color: #8fb596;
+  opacity: 0.8;
+}
+.cx-gate__play {
+  position: relative;
+  z-index: 2;
+  margin-top: 0.4rem;
+  font: 600 13px/1 "Courier New", monospace;
+  letter-spacing: 0.3em;
+  color: #cfe9d2;
+  border: 1px solid rgba(160, 220, 170, 0.55);
+  padding: 0.8em 1.6em;
+  animation: hfx-pulse 2.2s ease-in-out infinite;
+}
+.hfx-gate.cx-gate .hfx-gate__title {
+  text-shadow: 0 0 12px rgba(120, 220, 140, 0.35), 0 2px 6px #000;
+}
+.hfx-gate.cx-gate .hfx-gate__note {
+  max-width: 28em;
+  padding: 0 1.4rem;
+  line-height: 1.9;
+  opacity: 0.78;
+  text-shadow: 0 2px 6px #000;
+}
+.hfx-gate.cx-gate.hfx-entering {
+  animation: none;
+}
+.hfx-gate.cx-gate.hfx-entering .hfx-gate__door {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  animation: cx-gate-static 2.4s steps(14, end) forwards;
+}
+@keyframes cx-gate-static {
+  0%   { opacity: 0; background-position: 0 0; }
+  12%  { opacity: 0.9; background-position: 40px 20px; }
+  40%  { opacity: 0.55; background-position: -60px 90px; }
+  70%  { opacity: 0.8; background-position: 90px -40px; }
+  88%  { opacity: 1; background-color: #000; }
+  100% { opacity: 1; background-color: #000; }
+}
+
+/* ---------- 録画ランプ（ページの隅に出る。読んでいる側も録画されている） ---------- */
+.cx-hud {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 6600;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font: 600 11px/1 "Courier New", monospace;
+  letter-spacing: 0.1em;
+  color: #d3e6d1;
+  text-shadow: 0 0 5px rgba(120, 255, 140, 0.45), 0 1px 2px #000;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  pointer-events: none;
+}
+.cx-hud.is-on { opacity: 0.8; }
+.cx-hud__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5231f;
+  box-shadow: 0 0 8px #e5231f;
+  animation: cx-blink 1.2s steps(1, end) infinite;
+}
+.cx-hud.is-live .cx-hud__dot { background: #35e060; box-shadow: 0 0 8px #35e060; animation: none; }
+.cx-hud.is-glitch { animation: cx-hud-glitch 0.5s steps(2, end); }
+@keyframes cx-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.1; }
+}
+@keyframes cx-hud-glitch {
+  0%, 100% { transform: none; filter: none; }
+  20% { transform: translateX(-4px); filter: hue-rotate(90deg); }
+  50% { transform: translateX(5px) skewX(-8deg); }
+  80% { transform: translateX(-2px); opacity: 0.2; }
+}
+
+/* ---------- 防犯カメラの映像（小窓 ⇄ 画面いっぱい） ---------- */
+.cx-cam-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 6490;
+  background: rgba(0, 0, 0, 0.78);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+.cx-cam-dim.is-on { opacity: 1; }
+
+.cx-cam {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  width: min(300px, 54vw);
+  aspect-ratio: 8 / 5;
+  z-index: 6500;
+  background: #030603;
+  border: 1px solid rgba(150, 220, 165, 0.4);
+  box-shadow: 0 0 0 3px #090a09, 0 12px 44px rgba(0, 0, 0, 0.85), 0 0 30px rgba(80, 200, 110, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+}
+.cx-cam.is-on { opacity: 1; visibility: visible; transition: opacity 0.5s ease; }
+.cx-cam.is-big {
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  top: 50%;
+  width: min(94vw, 900px);
+  margin: calc(min(94vw, 900px) * -0.3125) 0 0 calc(min(94vw, 900px) * -0.5);
+}
+.cx-cam.is-cut { opacity: 0; transition: opacity 0.1s ease; }
+
+.cx-cam__view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  filter: grayscale(0.6) contrast(1.18) brightness(1.3) blur(0.45px);
+}
+.cx-cam__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform-origin: var(--zx, 30%) var(--zy, 42%);
+  transition: transform var(--zt, 0s) cubic-bezier(0.5, 0, 0.3, 1);
+}
+.cx-cam__grain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+.cx-cam__roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  top: -22%;
+  background: linear-gradient(to bottom, transparent, rgba(190, 255, 200, 0.07), transparent);
+  animation: cx-roll 5.5s linear infinite;
+}
+@keyframes cx-roll { to { top: 110%; } }
+.cx-cam__vig {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.66) 100%);
+}
+.cx-cam__hud {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font: 600 10px/1.3 "Courier New", monospace;
+  letter-spacing: 0.08em;
+  color: #d6ecd6;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+.cx-cam.is-big .cx-cam__hud { font-size: clamp(11px, 1.5vw, 15px); left: 14px; right: 14px; top: 12px; }
+.cx-cam__rec { display: flex; align-items: center; gap: 0.45em; }
+.cx-cam__rec i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e5231f;
+  box-shadow: 0 0 7px #e5231f;
+  animation: cx-blink 1.2s steps(1, end) infinite;
+}
+.cx-cam__ts { text-align: right; }
+.cx-cam__sig {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font: 700 clamp(12px, 2vw, 20px) "Courier New", monospace;
+  letter-spacing: 0.3em;
+  color: #cfe9d2;
+  background: #000;
+}
+.cx-cam.is-lost .cx-cam__sig { display: flex; }
+
+/* ---- 映像の中身（SVG）：ポーズごとに動きを変える。コマ落ちのような steps で動かす ---- */
+.cx-cam .c-door { transform-box: fill-box; transform-origin: 100% 50%; transform: scaleX(1); transition: transform 3.2s steps(10, end); }
+.cx-cam[data-door="ajar"] .c-door { transform: scaleX(0.94); transition-duration: 1s; }
+.cx-cam[data-door="open"] .c-door { transform: scaleX(0.2); }
+.cx-cam[data-door="shut"] .c-door { transform: scaleX(1); transition-duration: 1.6s; }
+
+.cx-cam .c-arm { stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 3.6s steps(9, end); }
+.cx-cam[data-arm="out"] .c-arm { stroke-dashoffset: 0; }
+.cx-cam .c-hand { opacity: 0; transition: opacity 0s linear 3.4s; }
+.cx-cam[data-arm="out"] .c-hand { opacity: 1; }
+
+.cx-cam .c-fig { opacity: 0; transform: translate(252px, 170px) rotate(-82deg); transition: transform 3s steps(9, end); }
+.cx-cam[data-pose="crawl-a"] .c-fig { opacity: 1; transform: translate(246px, 172px) rotate(-84deg); }
+.cx-cam[data-pose="crawl-b"] .c-fig { opacity: 1; transform: translate(206px, 176px) rotate(-86deg); transition-duration: 5s; }
+.cx-cam[data-pose="crawl-c"] .c-fig { opacity: 1; transform: translate(158px, 178px) rotate(-88deg); transition-duration: 5s; }
+.cx-cam[data-pose="rise"] .c-fig { opacity: 1; transform: translate(100px, 176px) rotate(-38deg); transition-duration: 4s; }
+.cx-cam[data-pose="stand"] .c-fig { opacity: 1; transform: translate(96px, 176px) rotate(0deg); transition-duration: 3s; }
+.cx-cam[data-pose="fridge"] .c-fig { opacity: 1; transform: translate(62px, 174px) rotate(0deg); transition-duration: 3s; }
+.cx-cam[data-pose="back-a"] .c-fig { opacity: 1; transform: translate(190px, 176px) rotate(-85deg); transition-duration: 6s; }
+.cx-cam[data-pose="back-b"] .c-fig { opacity: 1; transform: translate(252px, 172px) rotate(-84deg); transition-duration: 4s; }
+.cx-cam[data-pose="gone"] .c-fig { opacity: 0; transform: translate(252px, 172px) rotate(-82deg); transition: none; }
+.cx-cam[data-pose="new-stand"] .c-fig { opacity: 1; transform: translate(150px, 168px) rotate(0deg) scale(0.9); transition: none; }
+
+.cx-cam .c-eyes { opacity: 0; }
+.cx-cam[data-look="on"] .c-eyes { opacity: 1; }
+.cx-cam .c-head { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 1.6s steps(7, end); }
+.cx-cam[data-look="on"] .c-head { transform: rotate(-9deg) translate(-1px, 1px); }
+.cx-cam .c-fridge-light { opacity: 0; transition: opacity 0.4s steps(2, end); }
+.cx-cam[data-fridge="open"] .c-fridge-light { opacity: 1; }
+.cx-cam .c-fridge-door { transform-box: fill-box; transform-origin: 0% 50%; transition: transform 0.5s steps(3, end); }
+.cx-cam[data-fridge="open"] .c-fridge-door { transform: scaleX(0.35); }
+.cx-cam .c-sleeper { transform-box: fill-box; transform-origin: 50% 100%; animation: cx-breathe 4.6s ease-in-out infinite; }
+@keyframes cx-breathe { 50% { transform: scaleY(1.04); } }
+.cx-cam[data-scene="new"] .c-closet,
+.cx-cam[data-scene="new"] .c-kitchen { opacity: 0; }
+.cx-cam[data-scene="gen"] .c-bed,
+.cx-cam[data-scene="gen"] .c-closet,
+.cx-cam[data-scene="gen"] .c-kitchen,
+.cx-cam[data-scene="gen"] .c-sleeper { opacity: 0; }
+.cx-cam .c-genkan { opacity: 0; }
+.cx-cam[data-scene="gen"] .c-genkan { opacity: 1; }
+.cx-cam .c-ghost { opacity: 0; }
+.cx-cam[data-ghost="on"] .c-ghost { opacity: 0.9; }
+
+/* ---------- 天井（シミ・点検口・通気口。画面の上端に貼り付く） ---------- */
+.cx-ceiling {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30vh;
+  z-index: 6000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 138px, rgba(0, 0, 0, 0.55) 138px 140px),
+    linear-gradient(to bottom, rgba(54, 50, 44, 0.98), rgba(40, 37, 33, 0.92) 55%, rgba(20, 18, 16, 0));
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
+}
+.cx-ceiling.is-on { opacity: 1; }
+.cx-ceiling__stain {
+  position: absolute;
+  top: 34%;
+  right: 17%;
+  width: 56px;
+  height: 52px;
+  border-radius: 46% 54% 50% 50% / 55% 45% 55% 45%;
+  background: radial-gradient(ellipse at 45% 50%, rgba(92, 62, 28, 0.88) 0%, rgba(110, 76, 36, 0.65) 55%, rgba(110, 76, 36, 0) 78%);
+  filter: blur(1.2px);
+  opacity: 0;
+  transition: opacity 3s ease, transform 4s ease;
+}
+.cx-ceiling.has-stain .cx-ceiling__stain { opacity: 1; }
+.cx-ceiling__stain i {
+  position: absolute;
+  top: 36%;
+  width: 11px;
+  height: 7px;
+  border-radius: 50%;
+  background: #120a04;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.cx-ceiling__stain i:nth-child(1) { left: 22%; }
+.cx-ceiling__stain i:nth-child(2) { right: 22%; }
+.cx-ceiling__stain b {
+  position: absolute;
+  left: 34%;
+  right: 34%;
+  top: 66%;
+  height: 4px;
+  border-radius: 50%;
+  background: #120a04;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.cx-ceiling.is-face .cx-ceiling__stain { transform: scale(1.12); }
+.cx-ceiling.is-face .cx-ceiling__stain i,
+.cx-ceiling.is-face .cx-ceiling__stain b { opacity: 0.85; }
+
+.cx-ceiling__hatch {
+  --hs: clamp(110px, 24vw, 190px);
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  width: var(--hs);
+  height: var(--hs);
+  margin-left: calc(var(--hs) / -2);
+  background: #3d3a35;
+  border: 2px solid #1d1b18;
+  box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.18), 0 6px 14px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 2s ease;
+  overflow: visible;
+}
+.cx-ceiling.has-hatch .cx-ceiling__hatch { opacity: 1; }
+.cx-ceiling__hatch::before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #14120f;
+  top: 7px;
+  left: 7px;
+  box-shadow: calc(var(--hs) - 24px) 0 0 #14120f, 0 calc(var(--hs) - 24px) 0 #14120f, calc(var(--hs) - 24px) calc(var(--hs) - 24px) 0 #14120f;
+}
+.cx-ceiling__dark {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, #050403 20%, #000 80%);
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  transition: transform 1.8s steps(12, end);
+  box-shadow: inset 0 10px 22px #000;
+}
+.cx-ceiling.is-open .cx-ceiling__dark { transform: scaleY(1); }
+.cx-ceiling.is-ajar .cx-ceiling__dark { transform: scaleY(0.08); transition-duration: 2.4s; }
+.cx-ceiling__beam {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 280px;
+  height: 280px;
+  margin: -140px 0 0 -140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 240, 200, 0.34) 0%, rgba(255, 240, 200, 0.12) 38%, transparent 66%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.cx-ceiling.is-beam .cx-ceiling__beam { opacity: 1; }
+.cx-ceiling__vent {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: clamp(120px, 22vw, 180px);
+  height: 46px;
+  margin-left: calc(clamp(120px, 22vw, 180px) / -2);
+  background: #36322c;
+  border: 2px solid #17150f;
+  opacity: 0;
+  transition: opacity 2s ease;
+  overflow: hidden;
+}
+.cx-ceiling.has-vent .cx-ceiling__vent { opacity: 1; }
+.cx-ceiling__vent::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background: #020202;
+}
+.cx-ceiling__vent::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 7px, #38342d 7px 10px);
+}
+
+/* ---------- 暗がりの中の目 ---------- */
+.cx-eyes {
+  position: fixed;
+  z-index: 6800;
+  pointer-events: none;
+  width: 70px;
+  height: 36px;
+  margin: -18px 0 0 -35px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.cx-eyes.is-on { opacity: 1; }
+.cx-eyes::before {
+  content: "";
+  position: absolute;
+  inset: -34px -46px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.82) 30%, transparent 70%);
+}
+.cx-eyes i {
+  position: absolute;
+  top: 12px;
+  width: 15px;
+  height: 8px;
+  border-radius: 50% / 70%;
+  background: radial-gradient(ellipse, #fffbe0 15%, #f1e6a6 45%, rgba(240, 225, 150, 0) 78%);
+  box-shadow: 0 0 12px 4px rgba(250, 240, 180, 0.34);
+  transition: transform 0.1s ease;
+}
+.cx-eyes i:nth-child(1) { left: 11px; }
+.cx-eyes i:nth-child(2) { right: 11px; }
+.cx-eyes.is-blink i { transform: scaleY(0.08); }
+.cx-eyes.is-near { width: 130px; height: 64px; margin: -32px 0 0 -65px; }
+.cx-eyes.is-near i { top: 22px; width: 28px; height: 14px; }
+.cx-eyes.is-near i:nth-child(1) { left: 20px; }
+.cx-eyes.is-near i:nth-child(2) { right: 20px; }
+
+/* ---------- まぶた（眠りに落ちる直前の、閉じていく視界） ---------- */
+.cx-lid {
+  position: fixed;
+  left: -4%;
+  right: -4%;
+  z-index: 8900;
+  background: #000;
+  height: 0;
+  pointer-events: none;
+  transition: height var(--cx-lid-t, 3.2s) cubic-bezier(0.35, 0, 0.25, 1);
+  box-shadow: 0 0 40px 24px #000;
+}
+.cx-lid--top { top: 0; border-radius: 0 0 50% 50% / 0 0 22vh 22vh; }
+.cx-lid--bottom { bottom: 0; border-radius: 50% 50% 0 0 / 22vh 22vh 0 0; }
+.cx-lid.is-closed { height: 54vh; }
+
+/* ---------- 本文を冷やす／饐えた匂いで濁らせる ---------- */
+.story { transition: filter 2s ease; }
+body.cx-cold .story { filter: saturate(0.2) brightness(0.9) hue-rotate(185deg); }
+body.cx-stale .story { filter: sepia(0.55) saturate(1.5) hue-rotate(-14deg) brightness(0.92); }
+.cx-cold-ov {
+  position: fixed;
+  inset: 0;
+  z-index: 6100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(18, 36, 70, 0.72) 100%);
+}
+body.cx-cold .cx-cold-ov { opacity: 1; }
+
+/* ---------- ノート（犯人の手書きの記録。一文字ずつ書かれていく） ---------- */
+.story .note-hand {
+  position: relative;
+  font-family: "Zen Kurenaido", "Yu Mincho", "游明朝", serif;
+  font-size: 1.22rem;
+  line-height: 2.1;
+  letter-spacing: 0.06em;
+  color: #e8dcb8;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2.1em - 1px), rgba(210, 190, 140, 0.13) calc(2.1em - 1px), rgba(210, 190, 140, 0.13) 2.1em);
+  border-left: 2px solid rgba(190, 80, 70, 0.55);
+  padding: 0.3em 0.2em 0.3em 1.1rem;
+  text-align: left;
+  transform: rotate(-0.5deg);
+  text-shadow: 0 0 1px rgba(232, 220, 184, 0.3);
+  min-height: 3.2em;
+}
+.story .note-hand.is-shiver { animation: cx-shiver 0.18s steps(2, end) infinite; }
+@keyframes cx-shiver {
+  0% { transform: rotate(-0.5deg) translate(0, 0); }
+  50% { transform: rotate(-0.4deg) translate(1.2px, -0.8px); }
+  100% { transform: rotate(-0.6deg) translate(-1px, 0.8px); }
+}
+.story .note-hand .hfx-ch { opacity: 0; transition: opacity 0.12s linear; }
+.story .note-hand .hfx-ch.hfx-on { opacity: 1; }
+
+/* ---------- 鈴 ---------- */
+.manual-btn { transition: border-color 0.5s, color 0.5s, box-shadow 0.5s; }
+.manual-btn:hover { border-color: #888; color: #ddd; }
+.manual-btn.is-wrong { border-color: #8a2020; color: #c46060; box-shadow: 0 0 14px rgba(160, 30, 30, 0.35); }
+
+/* ---------- 最後の囁き ---------- */
+.cx-last {
+  position: fixed;
+  inset: 0;
+  z-index: 8800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.cx-last.is-on { opacity: 1; }
+.cx-last span {
+  font-size: clamp(1.8rem, 7vw, 3.4rem);
+  letter-spacing: 0.3em;
+  color: #d9d4c8;
+  text-shadow: 0 0 22px rgba(255, 255, 255, 0.25);
+  opacity: 0;
+  transition: opacity 3.6s ease;
+}
+.cx-last.is-text span { opacity: 0.9; }
+
+@media (max-width: 600px) {
+  .cx-cam:not(.is-big) { width: min(250px, 66vw); right: 8px; bottom: 8px; }
+  .cx-hud { font-size: 10px; top: 8px; left: 8px; }
+  .story .note-hand { font-size: 1.1rem; }
+}

@@ -6,8 +6,9 @@
 <title>第四章：友人への相談 ―― 最近、違和感を感じるんです</title>
 <link rel="stylesheet" href="../../common/horror.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fx.css">
 </head>
-<body style="--hfx-page-photo: url('/works/iwakan/assets/bg-room.jpg');">
+<body data-bgm="drone" data-hum="1" data-rec="1" style="--hfx-page-photo: url('/works/iwakan/assets/bg-night-bed.jpg');">
 
 <main class="story">
   <p class="work-title hfx-reveal">最近、違和感を感じるんです</p>
@@ -25,9 +26,9 @@
 
   <p class="hfx-reveal quote-line">「そうかもね。ちょっと、神経質になってるだけかも」</p>
 
-  <p class="hfx-reveal">そう言われて、少し安心した自分がいた。友人の言う通り、自分の思い込みが、大部分を占めているのかもしれない。そう思うようにして、その日は、久しぶりに、気持ちが軽くなったまま、帰路についた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c4-above">そう言われて、少し安心した自分がいた。友人の言う通り、自分の思い込みが、大部分を占めているのかもしれない。そう思うようにして、その日は、久しぶりに、気持ちが軽くなったまま、帰路についた。</p>
 
-  <p class="hfx-reveal">それからしばらくは、意識して、あまり気にしないように、過ごすことにした。記録をつけるのも、一旦、やめてみた。</p>
+  <p class="hfx-reveal scene-trigger" data-scene="c4-rec-blink">それからしばらくは、意識して、あまり気にしないように、過ごすことにした。記録をつけるのも、一旦、やめてみた。</p>
 
   <div class="btn-row hfx-reveal" data-reveal="near">
     <button id="manual-scare-button" class="manual-btn">鈴を鳴らす</button>
@@ -42,6 +43,7 @@
 </main>
 
 <script src="../../common/horror.js"></script>
+<script src="fx.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

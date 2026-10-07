@@ -54,3 +54,39 @@
 - 撮影者: Francesco Ungaro
 - 入手元: Pexels (https://www.pexels.com/photo/view-of-a-dark-corridor-11570561/)
 - ライセンス: Pexels License（クレジット表記不要・商用利用可）
+
+---
+
+# リニューアル版で追加した素材（すべて Pixabay Content License / Pexels License・クレジット表記不要・商用利用可）
+
+## 音楽（Pixabay Music）
+- bgm-drone.mp3 — Drone Ambient（AtlasAudio）ID 518685
+- bgm-psycho.mp3 — Psychological Horror（leberch）ID 520373
+- bgm-pressure.mp3 — Horror Ambience Psychological Pressure（OpenMindAudio）ID 508417
+- bgm-paranoia.mp3 — Paranoia Tension - Cinematic Loop（Sonican）ID 556961
+- bgm-dread.mp3 — Dread（leberch）ID 610571
+- bgm-dementia.mp3 — Dementia (Horror Piano Ambience)（KonstantinPazuzuStudio）ID 515960
+
+## 効果音（Pixabay Sound Effects）
+- amb-fridge.mp3 — Fridge hum（freesound_community）ID 60275（冒頭のみ使用）
+- sfx-fridge-open.mp3 — refrigerator door open（freesound_community）ID 88685
+- sfx-plastic-a/b.mp3 — plastic crinkling / plastic bag rustle（freesound_community）ID 27216 / 72540
+- sfx-creaking.mp3 / sfx-walls-creak.mp3 — Creaking / Wooden Walls Creaking（DRAGON-STUDIO）ID 401724 / 474057
+- sfx-creak-1〜4.mp3 — Floorboard Creak（DRAGON-STUDIO）ID 499645 / 499644 / 499651 / 499661
+- sfx-beep.mp3 — beep（freesound_community）ID 104060
+- sfx-static.mp3 — TV Static Noise（Universfield）ID 152056
+- sfx-pen.mp3 — Pen Writing on Paper（freesound_community）ID 71212
+- sfx-whisper-a/b.mp3 — Creepy Whisper / Ghost Whisper（DRAGON-STUDIO）ID 472369 / 351569
+- sfx-dial.mp3 — Phone outgoing call（freesound_community）ID 72202
+- sfx-wardrobe.mp3 — Opening closing wardrobe v.2（Kuzu420）ID 402297
+- sfx-scare-b/d.mp3 — Horror Jump-Scare Effect 4 / Ghost Scare Vintage（freesound_community / kalsstockmedia）ID 250456 / 6062
+- sfx-boom.mp3, sfx-breath.mp3, sfx-drag.mp3, sfx-shuffle.mp3, sfx-steps-*.mp3 — 「四十九日の戸」と共用（works/shijukunichi/assets/CREDITS.md 参照）
+
+## 画像（Pexels）
+- bg-night-bed.jpg — Pexels photo 11849692
+- bg-roof-beams.jpg — Pexels photo 38281828
+- bg-police-night.jpg — Pexels photo 11454278
+- bg-hotel-lamp.jpg — Pexels photo 29100031
+- bg-attic.jpg — Pexels photo 4655819
+- scare-hair.jpg — Pexels photo 7342412
+- scare-doorway.jpg — Pexels photo 14173576

@@ -42,15 +42,25 @@
   // title: 見出し文字列 / note: 補足文字列 / onEnter: クリック後に呼ばれるコールバック
   // sound: true = 合成ドア音／false = 無音／文字列 = registerSFX した効果音名。
   // 効果音（文字列指定時）が鳴り終わるまで、ドアの中に入っていく演出を見せてから本文を表示する。
-  function initEntryGate({ title = "クリックして入る", note = "音声が流れます。音量にご注意ください。", warning, onEnter, sound = true, maxWait = 30000 } = {}) {
+  // variant: "sliding" を指定すると、中央に札（slip＝「忌中」など）を貼った引き戸が左右に開くゲートになる。
+  function initEntryGate({ title = "クリックして入る", note = "音声が流れます。音量にご注意ください。", warning, onEnter, sound = true, maxWait = 30000, variant = "default", slip = "" } = {}) {
+    const sliding = variant === "sliding";
     const gate = document.createElement("div");
-    gate.className = "hfx-gate";
+    gate.className = "hfx-gate" + (sliding ? " hfx-gate--sliding" : "");
     gate.innerHTML =
+      (sliding
+        ? '<div class="hfx-gate__void"></div>' +
+          '<div class="hfx-gate__panel hfx-gate__panel--l"></div>' +
+          '<div class="hfx-gate__panel hfx-gate__panel--r"></div>'
+        : "") +
       (warning ? '<div class="hfx-gate__warning">' + warning + "</div>" : "") +
+      (sliding && slip ? '<div class="hfx-gate__slip"><span>' + slip + "</span></div>" : "") +
       '<div class="hfx-gate__title">' + title + "</div>" +
       '<div class="hfx-gate__note">' + note + "</div>" +
       '<div class="hfx-gate__door"></div>';
     document.body.appendChild(gate);
+    // ゲートが開くまで背後のスクロールを止める（見えない場所の演出が先に発火しないように）
+    document.documentElement.classList.add("hfx-locked");
 
     gate.addEventListener("click", function handler() {
       audioUnlocked = true;
@@ -61,6 +71,7 @@
       const finish = () => {
         if (finished) return;
         finished = true;
+        document.documentElement.classList.remove("hfx-locked");
         gate.classList.add("hfx-hidden");
         setTimeout(() => gate.remove(), 1000);
         if (typeof onEnter === "function") onEnter();
@@ -213,6 +224,7 @@
   // 章を移動するたびにBGMが0秒から鳴り直してしまう。
   function playBGM(src, { volume = 0.3, fadeMs = 2500, loop = true, resume = true } = {}) {
     if (bgmAudio) {
+      if (bgmAudio._hfxRamp) clearInterval(bgmAudio._hfxRamp);
       bgmAudio.pause();
       bgmAudio = null;
     }
@@ -254,17 +266,8 @@
       console.warn("[HorrorFX] BGM playback blocked (need user interaction first):", err);
     });
 
-    const steps = 30;
-    let i = 0;
-    const timer = setInterval(() => {
-      if (bgmAudio !== audio) {
-        clearInterval(timer);
-        return;
-      }
-      i++;
-      audio.volume = Math.min(volume, (volume * i) / steps);
-      if (i >= steps) clearInterval(timer);
-    }, fadeMs / steps);
+    audio._hfxTarget = volume;
+    rampVolume(audio, volume, fadeMs);
 
     return audio;
   }
@@ -273,17 +276,29 @@
     if (!bgmAudio) return;
     const audio = bgmAudio;
     bgmAudio = null;
-    const startVolume = audio.volume;
-    const steps = 20;
-    let i = 0;
-    const timer = setInterval(() => {
-      i++;
-      audio.volume = Math.max(0, startVolume * (1 - i / steps));
-      if (i >= steps) {
-        clearInterval(timer);
-        audio.pause();
+    audio._hfxTarget = 0;
+    rampVolume(audio, 0, fadeMs, () => audio.pause());
+  }
+
+  // audio.volume を ms かけて to へ滑らかに動かす（進行中のランプは打ち切る）
+  function rampVolume(audio, to, ms, onDone) {
+    if (audio._hfxRamp) clearInterval(audio._hfxRamp);
+    const from = audio.volume;
+    const t0 = performance.now();
+    if (ms <= 0) {
+      audio.volume = Math.max(0, Math.min(1, to));
+      if (onDone) onDone();
+      return;
+    }
+    audio._hfxRamp = setInterval(() => {
+      const p = Math.min(1, (performance.now() - t0) / ms);
+      audio.volume = Math.max(0, Math.min(1, from + (to - from) * p));
+      if (p >= 1) {
+        clearInterval(audio._hfxRamp);
+        audio._hfxRamp = null;
+        if (onDone) onDone();
       }
-    }, fadeMs / steps);
+    }, 30);
   }
 
   /* ---------------- ノイズバッファ生成（合成音の材料） ---------------- */
@@ -599,13 +614,16 @@
   }
 
   /* ---------------- ジャンプスケア ---------------- */
-  function jumpscare({ image, sfx, duration = 700, shakeScreen = true, volume = 1.0 } = {}) {
+  // sound:false にすると音は鳴らさない（別途 playSample などで好きな音を鳴らしたいとき用）
+  function jumpscare({ image, sfx, duration = 700, shakeScreen = true, volume = 1.0, sound = true } = {}) {
     const overlay = ensureOverlay("hfx-jumpscare-overlay");
     overlay.innerHTML = image ? '<img src="' + image + '" alt="">' : "";
     overlay.classList.add("hfx-active");
 
-    if (sfx) playSFX(sfx, { volume });
-    else playSting({ volume });
+    if (sound) {
+      if (sfx) playSFX(sfx, { volume });
+      else playSting({ volume });
+    }
     if (shakeScreen) shake(document.body, { duration: Math.min(duration, 500), sound: false });
 
     setTimeout(() => {
@@ -691,7 +709,599 @@
     });
   }
 
+  /* ============================================================
+     追加演出群（足音・無音・人影・着信・遅延表示・靴の回転 ほか）
+     ============================================================ */
+
+  const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  function haptic(pattern) {
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) {
+      // 非対応の端末では何もしない
+    }
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+  function rand(a, b) {
+    return a + Math.random() * (b - a);
+  }
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  /* ---------------- Web Audio サンプル（パン・ピッチ・音量・残響を自由に操作できる） ---------------- */
+  const sampleStore = new Map();
+
+  // 音源をあらかじめ取得しておく（デコードは初めて鳴らすときに行う）。
+  // normalize: 最大ピークがこの値になるよう自動で音量を揃える（小さすぎる素材の補正）
+  function loadSample(name, url, { normalize = 0.8 } = {}) {
+    if (sampleStore.has(name)) return;
+    const entry = { url, normalize, raw: null, decoding: null, data: null };
+    entry.raw = fetch(url).then((r) => {
+      if (!r.ok) throw new Error("HTTP " + r.status + " " + url);
+      return r.arrayBuffer();
+    });
+    entry.raw.catch((err) => console.warn("[HorrorFX] sample load failed:", err.message));
+    sampleStore.set(name, entry);
+  }
+
+  // 音の立ち上がり（足音1歩ぶんなど）の位置を検出する
+  function detectOnsets(buffer) {
+    const ch = buffer.getChannelData(0);
+    const sr = buffer.sampleRate;
+    const win = Math.max(1, Math.floor(sr * 0.02));
+    const env = [];
+    for (let i = 0; i + win <= ch.length; i += win) {
+      let s = 0;
+      for (let j = 0; j < win; j++) s += ch[i + j] * ch[i + j];
+      env.push(Math.sqrt(s / win));
+    }
+    let emax = 0;
+    for (const v of env) if (v > emax) emax = v;
+    const onsets = [];
+    let last = -1;
+    for (let k = 1; k < env.length; k++) {
+      const t = (k * win) / sr;
+      if (env[k] > emax * 0.28 && env[k - 1] < emax * 0.18 && t - last > 0.3) {
+        onsets.push(t);
+        last = t;
+      }
+    }
+    return onsets;
+  }
+
+  async function getSample(name) {
+    const entry = sampleStore.get(name);
+    if (!entry) return null;
+    if (entry.data) return entry.data;
+    if (!entry.decoding) {
+      entry.decoding = (async () => {
+        const raw = await entry.raw;
+        const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        const off = new Off(2, 1, 44100);
+        const buffer = await new Promise((resolve, reject) => off.decodeAudioData(raw.slice(0), resolve, reject));
+        const ch = buffer.getChannelData(0);
+        let peak = 0;
+        for (let i = 0; i < ch.length; i++) {
+          const a = Math.abs(ch[i]);
+          if (a > peak) peak = a;
+        }
+        const gain = peak > 0 ? Math.min(entry.normalize / peak, 40) : 1;
+        entry.data = { buffer, gain, peak, onsets: detectOnsets(buffer) };
+        return entry.data;
+      })().catch((err) => {
+        console.warn("[HorrorFX] sample decode failed:", name, err);
+        return null;
+      });
+    }
+    return entry.decoding;
+  }
+
+  function connectChain(ctx, source, { gain = 1, pan = 0, lowpass = 0, highpass = 0, lowshelf = 0, wet = 0.2 } = {}) {
+    const g = ctx.createGain();
+    g.gain.value = gain;
+    source.connect(g);
+    let node = g;
+    if (highpass) {
+      const f = ctx.createBiquadFilter();
+      f.type = "highpass";
+      f.frequency.value = highpass;
+      node.connect(f);
+      node = f;
+    }
+    if (lowpass) {
+      const f = ctx.createBiquadFilter();
+      f.type = "lowpass";
+      f.frequency.value = lowpass;
+      node.connect(f);
+      node = f;
+    }
+    if (lowshelf) {
+      const f = ctx.createBiquadFilter();
+      f.type = "lowshelf";
+      f.frequency.value = 220;
+      f.gain.value = lowshelf;
+      node.connect(f);
+      node = f;
+    }
+    if (pan && ctx.createStereoPanner) {
+      const p = ctx.createStereoPanner();
+      p.pan.value = Math.max(-1, Math.min(1, pan));
+      node.connect(p);
+      node = p;
+    }
+    routeToOutput(ctx, node, { wet });
+    return g;
+  }
+
+  // when は ctx.currentTime 基準の絶対時刻（秒）。offset / duration は元音源の中の位置（秒）。
+  function startSample(ctx, data, { when, offset = 0, duration, volume = 1, rate = 1, fade = 0.05, ...chain }) {
+    const src = ctx.createBufferSource();
+    src.buffer = data.buffer;
+    src.playbackRate.value = rate;
+    const g = connectChain(ctx, src, { gain: volume * data.gain, ...chain });
+    if (duration) {
+      const real = duration / rate;
+      g.gain.setValueAtTime(volume * data.gain, when + Math.max(0, real - fade));
+      g.gain.linearRampToValueAtTime(0.0001, when + real);
+      src.start(when, offset, duration);
+    } else {
+      src.start(when, offset);
+    }
+    return src;
+  }
+
+  async function playSample(name, { volume = 1, rate = 1, pan = 0, wet = 0.2, lowpass = 0, offset = 0, duration, delay = 0 } = {}) {
+    const data = await getSample(name);
+    if (!data) return null;
+    const ctx = getAudioContext();
+    const when = ctx.currentTime + delay / 1000 + 0.02;
+    return startSample(ctx, data, { when, offset, duration, volume, rate, pan, wet, lowpass });
+  }
+
+  /* ---------------- 足音（木の床を歩く音。1歩ごとに間隔・重さ・方向を制御できる） ---------------- */
+  const stepPool = { steps: [], drags: [], creaks: [] };
+
+  // 足音の元になる音源を登録する。steps は歩く音、drags は引きずる音、creaks は床板のきしみ。
+  function setFootstepSamples({ steps = [], drags = [], creaks = [] } = {}) {
+    steps.forEach((u, i) => loadSample("hfx-step-" + i, u));
+    drags.forEach((u, i) => loadSample("hfx-drag-" + i, u));
+    creaks.forEach((u, i) => loadSample("hfx-creak-" + i, u));
+    stepPool.steps = steps.map((_, i) => "hfx-step-" + i);
+    stepPool.drags = drags.map((_, i) => "hfx-drag-" + i);
+    stepPool.creaks = creaks.map((_, i) => "hfx-creak-" + i);
+  }
+
+  function slicesOf(data, { lead = 0.03, maxDur = 0.85 } = {}) {
+    const on = data.onsets;
+    if (!on.length) return [{ start: 0, dur: Math.min(maxDur, data.buffer.duration) }];
+    return on.map((t, i) => {
+      const start = Math.max(0, t - lead);
+      const next = on[i + 1] != null ? on[i + 1] - lead : data.buffer.duration;
+      return { start, dur: Math.max(0.15, Math.min(maxDur, next - start - 0.01)) };
+    });
+  }
+
+  async function collectSlices(names, opts) {
+    const out = [];
+    for (const n of names) {
+      const d = await getSample(n);
+      if (d) slicesOf(d, opts).forEach((s) => out.push({ data: d, ...s }));
+    }
+    return out;
+  }
+
+  // サンプルが無い場合の代用（低い「ドン」＋床の「コッ」）
+  function synthStep(ctx, when, { heavy = true, volume = 0.6, pan = 0, lowpass = 0 } = {}) {
+    const f0 = heavy ? 72 : 118;
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(f0 * 1.9, when);
+    osc.frequency.exponentialRampToValueAtTime(f0, when + 0.07);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.linearRampToValueAtTime(volume, when + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + (heavy ? 0.32 : 0.2));
+    osc.connect(g);
+    const n = ctx.createBufferSource();
+    n.buffer = createNoiseBuffer(ctx, 0.12);
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = heavy ? 260 : 420;
+    bp.Q.value = 1.1;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(volume * 0.9, when);
+    ng.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
+    n.connect(bp);
+    bp.connect(ng);
+    const mix = ctx.createGain();
+    g.connect(mix);
+    ng.connect(mix);
+    let node = mix;
+    if (lowpass) {
+      const f = ctx.createBiquadFilter();
+      f.type = "lowpass";
+      f.frequency.value = lowpass;
+      node.connect(f);
+      node = f;
+    }
+    if (pan && ctx.createStereoPanner) {
+      const p = ctx.createStereoPanner();
+      p.pan.value = pan;
+      node.connect(p);
+      node = p;
+    }
+    routeToOutput(ctx, node, { wet: 0.3 });
+    osc.start(when);
+    osc.stop(when + 0.4);
+    n.start(when);
+    n.stop(when + 0.13);
+  }
+
+  // kind: "heavy"（祖父のような重い足音）／"light"（右足を引きずる軽い足音）／"both"（二人が並んで歩く）
+  // fromVolume→toVolume で近づく／遠ざかる。at は何ms後に始めるか。戻り値は全体の長さ(ms)。
+  async function footsteps({
+    kind = "heavy", steps = 6, interval = 1000, jitter = 0.1, at = 0, volume = 0.7,
+    fromVolume = 1, toVolume = 1, pan = 0, panTo, muffled = false, creak = 0.25, drag, haptics = false,
+  } = {}) {
+    const ctx = getAudioContext();
+    const [stepSl, dragSl, creakSl] = await Promise.all([
+      collectSlices(stepPool.steps, { lead: 0.03, maxDur: 0.8 }),
+      collectSlices(stepPool.drags, { lead: 0.06, maxDur: 1.7 }),
+      collectSlices(stepPool.creaks, { lead: 0.02, maxDur: 1.4 }),
+    ]);
+    const useSynth = stepSl.length === 0;
+    const lightSteps = kind === "light" || kind === "both";
+    const withDrag = drag != null ? drag : lightSteps;
+    const approach = toVolume > fromVolume;
+    const retreat = toVolume < fromVolume;
+    const t0 = ctx.currentTime + at / 1000 + 0.05;
+    let t = t0;
+
+    const oneStep = (when, heavy, vol, pn, cut, rightFoot) => {
+      const wet = heavy ? 0.34 : 0.28;
+      if (useSynth) {
+        synthStep(ctx, when, { heavy, volume: vol * 0.8, pan: pn, lowpass: cut });
+      } else {
+        const s = pick(stepSl);
+        startSample(ctx, s.data, {
+          when, offset: s.start, duration: s.dur,
+          volume: vol * (heavy ? 1 : 0.62),
+          rate: heavy ? rand(0.8, 0.9) : rand(1.06, 1.18),
+          pan: pn, lowpass: cut, lowshelf: heavy ? 7 : 0, highpass: heavy ? 0 : 140, wet,
+        });
+      }
+      if (creakSl.length && Math.random() < creak) {
+        const c = pick(creakSl);
+        startSample(ctx, c.data, {
+          when: when + rand(0.03, 0.09), offset: c.start, duration: c.dur,
+          volume: vol * rand(0.4, 0.7), rate: rand(0.88, 1.08), pan: pn, lowpass: cut, wet: 0.35,
+        });
+      }
+      if (withDrag && !heavy && rightFoot && dragSl.length) {
+        const d = pick(dragSl);
+        startSample(ctx, d.data, {
+          when: when + 0.2, offset: d.start, duration: Math.min(d.dur, 1.0),
+          volume: vol * 0.85, rate: rand(0.95, 1.05), pan: pn, lowpass: cut || 5500, wet: 0.25, fade: 0.2,
+        });
+      }
+      if (haptics && heavy) setTimeout(() => haptic(16), Math.max(0, (when - ctx.currentTime) * 1000));
+    };
+
+    for (let i = 0; i < steps; i++) {
+      const p = steps > 1 ? i / (steps - 1) : 1;
+      const vol = volume * lerp(fromVolume, toVolume, p);
+      const pn = lerp(pan, panTo != null ? panTo : pan, p);
+      const cut = muffled ? 1300 : approach ? lerp(1500, 9000, p) : retreat ? lerp(9000, 1500, p) : 0;
+      const step = (interval / 1000) * (1 + rand(-jitter, jitter));
+      if (kind === "heavy") {
+        oneStep(t, true, vol, pn, cut, false);
+      } else if (kind === "light") {
+        oneStep(t, false, vol, pn, cut, i % 2 === 1);
+      } else {
+        oneStep(t, true, vol, pn, cut, false);
+        oneStep(t + step * 0.42, false, vol, pn, cut, i % 2 === 1);
+      }
+      t += step;
+    }
+    return Math.round((t - t0) * 1000);
+  }
+
+  // 床をこする音（靴が回る／足を引きずる）
+  async function playScrape({ duration = 600, volume = 0.5, pan = 0 } = {}) {
+    const ctx = getAudioContext();
+    const slices = await collectSlices(stepPool.drags, { lead: 0.05, maxDur: 1.7 });
+    const when = ctx.currentTime + 0.02;
+    if (slices.length) {
+      const s = pick(slices);
+      const dur = Math.min(s.dur, duration / 1000 + 0.15);
+      const data = s.data;
+      startSample(ctx, data, { when, offset: s.start, duration: dur, volume, rate: rand(0.92, 1.05), pan, wet: 0.2, lowpass: 4500, fade: 0.12 });
+      return;
+    }
+    const dur = duration / 1000;
+    const n = ctx.createBufferSource();
+    n.buffer = createNoiseBuffer(ctx, dur + 0.05);
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 1800;
+    bp.Q.value = 0.8;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.linearRampToValueAtTime(volume * 0.5, when + dur * 0.3);
+    g.gain.linearRampToValueAtTime(0.0001, when + dur);
+    n.connect(bp);
+    bp.connect(g);
+    routeToOutput(ctx, g, { wet: 0.2 });
+    n.start(when);
+    n.stop(when + dur + 0.05);
+  }
+
+  /* ---------------- 環境音レイヤー（虫の声など）と「無音」 ---------------- */
+  const ambience = new Map();
+
+  function playAmbience(name, src, { volume = 0.3, fadeMs = 3000, loop = true } = {}) {
+    stopAmbience(name, { fadeMs: 400 });
+    const audio = new Audio(src);
+    audio.loop = loop;
+    audio.volume = 0;
+    audio._hfxTarget = volume;
+    ambience.set(name, audio);
+    audio.play().catch((err) => {
+      console.warn("[HorrorFX] ambience playback blocked (need user interaction first):", err);
+    });
+    rampVolume(audio, volume, fadeMs);
+    return audio;
+  }
+
+  function stopAmbience(name, { fadeMs = 1500 } = {}) {
+    const audio = ambience.get(name);
+    if (!audio) return;
+    ambience.delete(name);
+    audio._hfxTarget = 0;
+    rampVolume(audio, 0, fadeMs, () => audio.pause());
+  }
+
+  function audioLayers() {
+    return [bgmAudio, ...ambience.values()].filter(Boolean);
+  }
+
+  let silenceTimer = null;
+
+  // 「虫の声がやんだ」「足音が止まった」を作る。BGMと環境音を一瞬で消し、画面の四隅を暗くして、
+  // duration 後にゆっくり戻す。restore:false なら unsilence() を呼ぶまで無音のまま。
+  function silence({ duration = 4000, restoreMs = 3000, visual = true, restore = true } = {}) {
+    audioLayers().forEach((a) => rampVolume(a, 0, 140));
+    if (visual) {
+      document.body.classList.add("hfx-silent");
+      const ov = ensureOverlay("hfx-silence-overlay");
+      ov.style.transitionDuration = "0.35s";
+      ov.classList.add("hfx-active");
+    }
+    clearTimeout(silenceTimer);
+    return new Promise((resolve) => {
+      if (!restore) return resolve();
+      silenceTimer = setTimeout(() => {
+        unsilence({ restoreMs });
+        resolve();
+      }, duration);
+    });
+  }
+
+  function unsilence({ restoreMs = 3000 } = {}) {
+    clearTimeout(silenceTimer);
+    audioLayers().forEach((a) => rampVolume(a, a._hfxTarget != null ? a._hfxTarget : 0.3, restoreMs));
+    const ov = document.querySelector(".hfx-silence-overlay");
+    if (ov) {
+      ov.style.transitionDuration = restoreMs + "ms";
+      ov.classList.remove("hfx-active");
+    }
+    document.body.classList.remove("hfx-silent");
+  }
+
+  /* ---------------- 人影（画面の端に、青白い人の形がぼんやり立つ） ---------------- */
+  function shadowFigures({ figures, duration = 2600, fadeIn = 900 } = {}) {
+    const list = figures || [
+      { x: 36, h: 52, lean: -2 },
+      { x: 62, h: 42, lean: 4 },
+    ];
+    const root = ensureOverlay("hfx-shadows");
+    root.innerHTML = "";
+    root.style.setProperty("--hfx-shadow-in", fadeIn + "ms");
+    list.forEach((f, i) => {
+      const el = document.createElement("div");
+      el.className = "hfx-shadow-figure";
+      el.style.setProperty("--x", f.x + "%");
+      el.style.setProperty("--h", f.h + "vh");
+      el.style.setProperty("--lean", (f.lean || 0) + "deg");
+      el.style.animationDelay = i * 0.7 + "s, " + i * 0.3 + "s";
+      root.appendChild(el);
+    });
+    void root.offsetWidth;
+    root.classList.add("hfx-active");
+    clearTimeout(root._hfxTimer);
+    root._hfxTimer = setTimeout(() => {
+      root.style.setProperty("--hfx-shadow-in", "1400ms");
+      root.classList.remove("hfx-active");
+    }, duration);
+  }
+
+  /* ---------------- 着信通知（スマホの「不在着信」バナーが降りてくる） ---------------- */
+  const PHONE_SVG =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>';
+
+  function notify({ app = "電話", title = "不在着信", body = "", time = "いま", duration = 5600, sound = "phone", vibrate = true } = {}) {
+    const el = document.createElement("div");
+    el.className = "hfx-notify";
+    el.setAttribute("role", "status");
+    el.innerHTML =
+      '<div class="hfx-notify__icon">' + PHONE_SVG + "</div>" +
+      '<div class="hfx-notify__main">' +
+      '<div class="hfx-notify__top"><span>' + app + "</span><span>" + time + "</span></div>" +
+      '<div class="hfx-notify__title">' + title + "</div>" +
+      '<div class="hfx-notify__body">' + body + "</div>" +
+      "</div>";
+    document.body.appendChild(el);
+    void el.offsetWidth; // 初期位置を確定させてから transition を始める
+    el.classList.add("hfx-in");
+    if (sound) {
+      if (sampleStore.has(sound)) playSample(sound, { volume: 0.9, wet: 0.05 });
+      else playPhoneBuzz();
+    }
+    if (vibrate) haptic([260, 110, 260, 110, 260]);
+    setTimeout(() => {
+      el.classList.remove("hfx-in");
+      setTimeout(() => el.remove(), 700);
+    }, duration);
+    return el;
+  }
+
+  function playPhoneBuzz() {
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
+    for (let i = 0; i < 3; i++) {
+      const t = now + i * 0.37;
+      const o = ctx.createOscillator();
+      o.type = "square";
+      o.frequency.value = 135;
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = 520;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.16, t + 0.02);
+      g.gain.setValueAtTime(0.16, t + 0.24);
+      g.gain.linearRampToValueAtTime(0.0001, t + 0.27);
+      o.connect(lp);
+      lp.connect(g);
+      routeToOutput(ctx, g, { wet: 0.05 });
+      o.start(t);
+      o.stop(t + 0.3);
+    }
+  }
+
+  /* ---------------- 遅延表示テキスト（ためらうように、一文字ずつ現れる） ---------------- */
+  function prepareSlowText(target = ".slow-reveal") {
+    const els = typeof target === "string" ? document.querySelectorAll(target) : [target];
+    els.forEach((el) => {
+      if (!el || el.dataset.hfxSlow) return;
+      el.dataset.hfxSlow = "1";
+      const text = el.textContent.trim();
+      el.setAttribute("aria-label", text);
+      el.textContent = "";
+      const frag = document.createDocumentFragment();
+      [...text].forEach((ch) => {
+        const s = document.createElement("span");
+        s.className = "hfx-ch";
+        s.setAttribute("aria-hidden", "true");
+        s.textContent = ch;
+        frag.appendChild(s);
+      });
+      el.appendChild(frag);
+    });
+  }
+
+  // base: 1文字あたりのms／punct: 句読点などで止まるms／jitter: ばらつき（0〜1）
+  function slowReveal(el, { base = 85, punct = 380, jitter = 0.5, onDone } = {}) {
+    prepareSlowText(el);
+    const chars = el.querySelectorAll(".hfx-ch");
+    if (reduceMotion) {
+      chars.forEach((c) => c.classList.add("hfx-on"));
+      if (onDone) onDone();
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      let i = 0;
+      const next = () => {
+        if (i >= chars.length) {
+          if (onDone) onDone();
+          resolve();
+          return;
+        }
+        const c = chars[i++];
+        c.classList.add("hfx-on");
+        const isPause = /[、。，．…ー―!?！？」「）]/.test(c.textContent);
+        setTimeout(next, (isPause ? punct : base) * (1 + (Math.random() - 0.5) * jitter));
+      };
+      next();
+    });
+  }
+
+  /* ---------------- 回転する靴（踏み石の上の靴が、誰の手も触れずに向きを変える） ---------------- */
+  // figure: .shoe-compass 要素。deg: 靴の向き（0=戸の方、180=道の方）。
+  // style "ghost" は止まっては動く不自然な回り方、"hand" は人が手で直す速い回り方。
+  function turnShoe(figure, deg, { duration = 3600, style = "ghost", sound = true, caption } = {}) {
+    const pair = figure.querySelector(".shoe-compass__pair");
+    if (!pair) return Promise.resolve();
+    const from = parseFloat(figure.dataset.angle || "0");
+    const delta = deg - from;
+    const ease = "cubic-bezier(.45,.05,.3,1)";
+    let frames;
+    let bursts = [];
+    if (style === "ghost") {
+      const stops = [[0, 0], [0.08, 0.06], [0.22, 0.06], [0.34, 0.32], [0.5, 0.32], [0.6, 0.55], [0.78, 0.55], [1, 1]];
+      frames = stops.map(([o, p]) => ({ transform: "rotate(" + (from + delta * p) + "deg)", offset: o, easing: ease }));
+      bursts = [[0, 0.08], [0.22, 0.34], [0.5, 0.6], [0.78, 1]];
+    } else {
+      frames = [
+        { transform: "rotate(" + from + "deg)", offset: 0, easing: "ease-out" },
+        { transform: "rotate(" + (from + delta * 1.05) + "deg)", offset: 0.7, easing: "ease-in-out" },
+        { transform: "rotate(" + deg + "deg)", offset: 1 },
+      ];
+      bursts = [[0, 0.7]];
+    }
+    if (sound) {
+      bursts.forEach(([a, b]) => {
+        setTimeout(() => playScrape({ duration: (b - a) * duration, volume: style === "ghost" ? 0.5 : 0.4 }), a * duration);
+      });
+    }
+    figure.classList.add("is-turning");
+    if (!pair.animate || reduceMotion) {
+      pair.style.transform = "rotate(" + deg + "deg)";
+      figure.dataset.angle = String(deg);
+      figure.classList.remove("is-turning");
+      if (caption) setCaption(figure, caption);
+      return Promise.resolve();
+    }
+    const anim = pair.animate(frames, { duration, fill: "forwards" });
+    return anim.finished.then(
+      () => {
+        pair.style.transform = "rotate(" + deg + "deg)";
+        anim.cancel();
+        figure.dataset.angle = String(deg);
+        figure.classList.remove("is-turning");
+        if (caption) setCaption(figure, caption);
+      },
+      () => {}
+    );
+  }
+
+  function setCaption(figure, text) {
+    const cap = figure.querySelector("figcaption");
+    if (cap) cap.textContent = text;
+  }
+
   window.HorrorFX = {
+    loadSample,
+    playSample,
+    setFootstepSamples,
+    footsteps,
+    playScrape,
+    playAmbience,
+    stopAmbience,
+    silence,
+    unsilence,
+    shadowFigures,
+    notify,
+    prepareSlowText,
+    slowReveal,
+    turnShoe,
+    setCaption,
+    haptic,
     initEntryGate,
     registerSFX,
     playSFX,

@@ -63,6 +63,38 @@ HTML/CSS/JSのみで動作し、ビルド不要。
 
 具体的な使い方は `works/sample/script.js` を参照。
 
+### 「四十九日の戸」（`works/shijukunichi`）で追加した演出
+
+実音源のサンプルを読み込み、足音を1歩ずつ切り出して再生する仕組みなど、より空間的な演出を追加している。使い方は `works/shijukunichi/script.js` を参照。
+
+| 関数 | 説明 |
+|---|---|
+| `initEntryGate({variant: "sliding", slip: "忌中"})` | 引き戸が左右に開く入場ゲート。開くまで本文のスクロールをロックする。 |
+| `loadSample` / `playSample` / `setFootstepSamples` | 音声を読み込み（自動で音量を正規化）、音量・再生速度・左右定位・リバーブ・ローパス付きで再生。 |
+| `footsteps({kind, steps, interval, jitter, at, fromVolume, toVolume, pan, panTo, muffled, creak, drag})` | 複数歩の足音を、遠→近／左→右などの変化つきで鳴らす。返り値は総再生時間(ms)。 |
+| `playAmbience` / `stopAmbience` | 環境音（虫の声など）をループ再生。 |
+| `silence({duration, restoreMs})` / `unsilence()` | BGM・環境音を急に消し、画面を暗くする「無音」演出。 |
+| `shadowFigures({figures, duration})` | 画面の端にぼんやり立つ人影を出す。 |
+| `notify({app, title, body})` | スマホの通知バナー（不在着信など）を表示。 |
+| `prepareSlowText` / `slowReveal(el)` | 文字を一文字ずつ、句読点で間を置きながら表示。 |
+| `turnShoe(figure, deg, {style: "ghost"\|"hand"})` | 飛び石上の靴の向きを、目を離した隙に回す。 |
+| `haptic(pattern)` | 対応端末で振動させる。 |
+
+### 「最近、違和感を感じるんです」（`works/iwakan`）の専用演出
+
+共通ライブラリではなく、この作品だけの `works/iwakan/fx.js`（`window.CX`）と `fx.css` で持っている。本文の `<p>` に `class="scene-trigger" data-scene="名前"` を付けると、`script.js` の `scenes[名前]` が走る。
+
+| 部品 | 説明 |
+|---|---|
+| `CX.HUD` | 画面隅の録画ランプ。読んでいる端末の現在時刻が、そのまま録画時刻になる。 |
+| `CX.Cam` | 防犯カメラの映像（SVG製）。小窓⇄全画面、扉・腕・人影のポーズ、デジタルズーム、ノイズ。 |
+| `CX.Ceiling` | 画面上端に天井（シミ・点検口・通気口・懐中電灯の光）を出す。 |
+| `CX.eyes` | 暗がりに浮かぶ目。 |
+| `CX.Lids` | 眠りに落ちる直前の、閉じていくまぶた。 |
+| `class="note-hand"` | 犯人のノート。手書き風の字が一文字ずつ書かれる。 |
+
+素材クレジットは `works/*/assets/CREDITS.md` に記載。
+
 ## 見た目の共通ルール（フレーム／背景写真）
 
 - `common/horror.css` が、全ページの外側に「うっすら写真の壁紙＋グランジノイズ＋ビネット」を敷き、`.story`（や `.hfx-frame`）を中央の読みやすい1枚の画面として浮かび上がらせている。
