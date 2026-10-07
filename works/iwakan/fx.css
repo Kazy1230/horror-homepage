@@ -342,10 +342,11 @@
   background: url("assets/cam/eyes.jpg") center / cover no-repeat;
   mix-blend-mode: screen;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  filter: blur(var(--eb, 0px));
+  transition: opacity var(--ef, 0.35s) ease;
 }
-.cx-eyes.is-on { opacity: 0.95; }
-.cx-eyes.is-blink { transform: scaleY(0.06); transition: transform 0.09s ease, opacity 0.35s ease; }
+.cx-eyes.is-on { opacity: var(--eo, 0.95); }
+.cx-eyes.is-blink { transform: scaleY(0.06); transition: transform 0.09s ease, opacity var(--ef, 0.35s) ease; }
 .cx-eyes.is-near { --ew: min(520px, 96vw); }
 
 /* ---------- まぶた（眠りに落ちる直前の、閉じていく視界） ---------- */

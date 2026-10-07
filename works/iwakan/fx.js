@@ -272,11 +272,14 @@
   };
 
   /* ---------------- 暗がりの目（写真の目が、暗闇にぼうっと浮かぶ） ---------------- */
-  async function eyes({ x = "50%", y = "12%", ms = 1800, near = false, blinks = 1, width } = {}) {
+  async function eyes({ x = "50%", y = "12%", ms = 1800, near = false, blinks = 1, width, opacity, fade, blur } = {}) {
     const el = div("cx-eyes");
     el.style.left = x;
     el.style.top = y;
     if (width) el.style.setProperty("--ew", width + "px");
+    if (opacity != null) el.style.setProperty("--eo", opacity);
+    if (fade != null) el.style.setProperty("--ef", fade + "ms");
+    if (blur != null) el.style.setProperty("--eb", blur + "px");
     el.classList.toggle("is-near", near);
     void el.offsetWidth;
     el.classList.add("is-on");
@@ -333,7 +336,8 @@
   // 点検口／通気口の暗がりの中に、目を浮かべる
   function eyesIn(kind, opts = {}) {
     const c = Ceiling.center(kind);
-    return eyes({ x: c.x + "px", y: c.y + "px", width: Math.round(c.w * 0.92), ...opts });
+    // 天井の暗がりの目は、さりげなく：小さく、薄く、ゆっくり浮かんでゆっくり消える（まばたきもしない）
+    return eyes({ x: c.x + "px", y: c.y + "px", width: Math.round(c.w * 0.62), opacity: 0.3, fade: 2200, blur: 1.2, blinks: 0, ...opts });
   }
 
   window.CX = { HUD, Cam, Ceiling, Lids, eyes, eyesIn, cold, stale, wait };
