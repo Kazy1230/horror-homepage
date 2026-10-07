@@ -559,7 +559,7 @@ body.hfx-silent .hfx-frame {
   transition: filter 0.5s ease;
 }
 
-/* ---------- 人影（青白い、顔のない人の形） ---------- */
+/* ---------- 人影（長い服の女のシルエット写真を、青白く反転してぼかしたもの） ---------- */
 
 .hfx-shadows {
   position: fixed;
@@ -580,42 +580,16 @@ body.hfx-silent .hfx-frame {
   bottom: -3vh;
   left: var(--x, 50%);
   height: var(--h, 46vh);
-  width: calc(var(--h, 46vh) * 0.4);
+  width: calc(var(--h, 46vh) * 0.372);
   transform: translateX(-50%) rotate(var(--lean, 0deg));
-  filter: blur(3px);
+  background: url("shadow-woman.png") center bottom / contain no-repeat;
+  filter: invert(1) brightness(0.58) contrast(1.15) blur(2.2px);
+  opacity: 0.6;
   animation: hfx-shadow-sway 4.2s ease-in-out infinite, hfx-shadow-flicker 2.6s steps(1, end) infinite;
 }
 
-.hfx-shadow-figure::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 34%;
-  aspect-ratio: 0.78;
-  transform: translateX(-50%) rotate(var(--tilt, -7deg));
-  border-radius: 46% 46% 54% 54% / 42% 42% 58% 58%;
-  background:
-    radial-gradient(ellipse 5% 9% at 50% 80%, #000 55%, transparent 70%),
-    radial-gradient(ellipse 9.5% 19% at 34% 52%, #000 56%, transparent 68%),
-    radial-gradient(ellipse 7.5% 15% at 66% 55%, #000 56%, transparent 68%),
-    radial-gradient(ellipse at 50% 36%, rgba(206, 200, 190, 0.4), rgba(140, 135, 128, 0.26) 62%, rgba(70, 66, 62, 0.1) 100%);
-  z-index: 1;
-}
-
-.hfx-shadow-figure::after {
-  content: "";
-  position: absolute;
-  top: 13%;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  clip-path: polygon(36% 0, 64% 0, 100% 26%, 100% 100%, 0 100%, 0 26%);
-  background: linear-gradient(to bottom, rgba(178, 172, 162, 0.3), rgba(112, 108, 101, 0.2) 46%, rgba(36, 34, 32, 0.06) 100%);
-}
-
-.hfx-shadow-figure:nth-child(2)::before {
-  --tilt: 9deg;
+.hfx-shadow-figure:nth-child(2) {
+  transform: translateX(-50%) scaleX(-1) rotate(var(--lean, 0deg));
 }
 
 @keyframes hfx-shadow-sway {

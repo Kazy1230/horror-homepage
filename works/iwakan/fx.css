@@ -185,16 +185,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  filter: grayscale(0.6) contrast(1.18) brightness(1.3) blur(0.45px);
-}
-.cx-cam__svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  transform-origin: var(--zx, 30%) var(--zy, 42%);
-  transition: transform var(--zt, 0s) cubic-bezier(0.5, 0, 0.3, 1);
+  filter: contrast(1.06) brightness(1.02);
 }
 .cx-cam__grain {
   position: absolute;
@@ -259,222 +250,103 @@
 }
 .cx-cam.is-lost .cx-cam__sig { display: flex; }
 
-/* ---- 映像の中身（SVG）：ポーズごとに動きを変える。コマ落ちのような steps で動かす ---- */
-.cx-cam .c-door { transform-box: fill-box; transform-origin: 100% 50%; transform: scaleX(1); transition: transform 3.2s steps(10, end); }
-.cx-cam[data-door="ajar"] .c-door { transform: scaleX(0.94); transition-duration: 1s; }
-.cx-cam[data-door="open"] .c-door { transform: scaleX(0.2); }
-.cx-cam[data-door="shut"] .c-door { transform: scaleX(1); transition-duration: 1.6s; }
+/* ---- 映像の中身（写真を暗視カメラ風に加工したコマ）。コマ落ちのように、切り替わるだけで動かない ---- */
+.cx-cam__stage {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--zx, 30%) var(--zy, 30%);
+  transition: transform var(--zt, 0s) cubic-bezier(0.5, 0, 0.3, 1);
+}
+.cx-cam__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+.cx-cam__frame.is-on { opacity: 1; }
+.cx-cam.is-jolt .cx-cam__stage { animation: cx-jolt 0.16s steps(2, end); }
+@keyframes cx-jolt {
+  0% { transform: translate(-6px, 3px) scale(1.02); }
+  50% { transform: translate(5px, -2px) scale(1.01); filter: brightness(1.6); }
+  100% { transform: none; }
+}
 
-.cx-cam .c-arm { stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 3.6s steps(9, end); }
-.cx-cam[data-arm="out"] .c-arm { stroke-dashoffset: 0; }
-.cx-cam .c-hand { opacity: 0; transition: opacity 0s linear 3.4s; }
-.cx-cam[data-arm="out"] .c-hand { opacity: 1; }
-
-.cx-cam .c-fig { opacity: 0; transform: translate(252px, 170px) rotate(-82deg); transition: transform 3s steps(9, end); }
-.cx-cam[data-pose="crawl-a"] .c-fig { opacity: 1; transform: translate(246px, 172px) rotate(-84deg); }
-.cx-cam[data-pose="crawl-b"] .c-fig { opacity: 1; transform: translate(206px, 176px) rotate(-86deg); transition-duration: 5s; }
-.cx-cam[data-pose="crawl-c"] .c-fig { opacity: 1; transform: translate(158px, 178px) rotate(-88deg); transition-duration: 5s; }
-.cx-cam[data-pose="rise"] .c-fig { opacity: 1; transform: translate(100px, 176px) rotate(-38deg); transition-duration: 4s; }
-.cx-cam[data-pose="stand"] .c-fig { opacity: 1; transform: translate(96px, 176px) rotate(0deg); transition-duration: 3s; }
-.cx-cam[data-pose="fridge"] .c-fig { opacity: 1; transform: translate(62px, 174px) rotate(0deg); transition-duration: 3s; }
-.cx-cam[data-pose="back-a"] .c-fig { opacity: 1; transform: translate(190px, 176px) rotate(-85deg); transition-duration: 6s; }
-.cx-cam[data-pose="back-b"] .c-fig { opacity: 1; transform: translate(252px, 172px) rotate(-84deg); transition-duration: 4s; }
-.cx-cam[data-pose="gone"] .c-fig { opacity: 0; transform: translate(252px, 172px) rotate(-82deg); transition: none; }
-.cx-cam[data-pose="new-stand"] .c-fig { opacity: 1; transform: translate(150px, 168px) rotate(0deg) scale(0.9); transition: none; }
-
-.cx-cam .c-eyes { opacity: 0; }
-.cx-cam[data-look="on"] .c-eyes { opacity: 1; }
-.cx-cam .c-head { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 1.6s steps(7, end); }
-.cx-cam[data-look="on"] .c-head { transform: rotate(-9deg) translate(-1px, 1px); }
-.cx-cam .c-fridge-light { opacity: 0; transition: opacity 0.4s steps(2, end); }
-.cx-cam[data-fridge="open"] .c-fridge-light { opacity: 1; }
-.cx-cam .c-fridge-door { transform-box: fill-box; transform-origin: 0% 50%; transition: transform 0.5s steps(3, end); }
-.cx-cam[data-fridge="open"] .c-fridge-door { transform: scaleX(0.35); }
-.cx-cam .c-sleeper { transform-box: fill-box; transform-origin: 50% 100%; animation: cx-breathe 4.6s ease-in-out infinite; }
-@keyframes cx-breathe { 50% { transform: scaleY(1.04); } }
-.cx-cam[data-scene="new"] .c-closet,
-.cx-cam[data-scene="new"] .c-kitchen { opacity: 0; }
-.cx-cam[data-scene="gen"] .c-bed,
-.cx-cam[data-scene="gen"] .c-closet,
-.cx-cam[data-scene="gen"] .c-kitchen,
-.cx-cam[data-scene="gen"] .c-sleeper { opacity: 0; }
-.cx-cam .c-genkan { opacity: 0; }
-.cx-cam[data-scene="gen"] .c-genkan { opacity: 1; }
-.cx-cam .c-ghost { opacity: 0; }
-.cx-cam[data-ghost="on"] .c-ghost { opacity: 0.9; }
-
-/* ---------- 天井（シミ・点検口・通気口。画面の上端に貼り付く） ---------- */
+/* ---------- 天井（剥がれた漆喰の天井写真。シミ・点検口・通気口。画面の上端に貼り付く） ---------- */
 .cx-ceiling {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 30vh;
+  min-height: 150px;
   z-index: 6000;
   pointer-events: none;
   opacity: 0;
   transition: opacity 1.8s ease;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 138px, rgba(0, 0, 0, 0.55) 138px 140px),
-    linear-gradient(to bottom, rgba(54, 50, 44, 0.98), rgba(40, 37, 33, 0.92) 55%, rgba(20, 18, 16, 0));
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 64%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 64%, transparent 100%);
 }
 .cx-ceiling.is-on { opacity: 1; }
-.cx-ceiling__stain {
-  position: absolute;
-  top: 34%;
-  right: 17%;
-  width: 56px;
-  height: 52px;
-  border-radius: 46% 54% 50% 50% / 55% 45% 55% 45%;
-  background: radial-gradient(ellipse at 45% 50%, rgba(92, 62, 28, 0.88) 0%, rgba(110, 76, 36, 0.65) 55%, rgba(110, 76, 36, 0) 78%);
-  filter: blur(1.2px);
-  opacity: 0;
-  transition: opacity 3s ease, transform 4s ease;
-}
-.cx-ceiling.has-stain .cx-ceiling__stain { opacity: 1; }
-.cx-ceiling__stain i {
-  position: absolute;
-  top: 36%;
-  width: 11px;
-  height: 7px;
-  border-radius: 50%;
-  background: #120a04;
-  opacity: 0;
-  transition: opacity 1.4s ease;
-}
-.cx-ceiling__stain i:nth-child(1) { left: 22%; }
-.cx-ceiling__stain i:nth-child(2) { right: 22%; }
-.cx-ceiling__stain b {
-  position: absolute;
-  left: 34%;
-  right: 34%;
-  top: 66%;
-  height: 4px;
-  border-radius: 50%;
-  background: #120a04;
-  opacity: 0;
-  transition: opacity 1.4s ease;
-}
-.cx-ceiling.is-face .cx-ceiling__stain { transform: scale(1.12); }
-.cx-ceiling.is-face .cx-ceiling__stain i,
-.cx-ceiling.is-face .cx-ceiling__stain b { opacity: 0.85; }
-
-.cx-ceiling__hatch {
-  --hs: clamp(110px, 24vw, 190px);
-  position: absolute;
-  left: 50%;
-  top: 20%;
-  width: var(--hs);
-  height: var(--hs);
-  margin-left: calc(var(--hs) / -2);
-  background: #3d3a35;
-  border: 2px solid #1d1b18;
-  box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.18), 0 6px 14px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  transition: opacity 2s ease;
-  overflow: visible;
-}
-.cx-ceiling.has-hatch .cx-ceiling__hatch { opacity: 1; }
-.cx-ceiling__hatch::before {
-  content: "";
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #14120f;
-  top: 7px;
-  left: 7px;
-  box-shadow: calc(var(--hs) - 24px) 0 0 #14120f, 0 calc(var(--hs) - 24px) 0 #14120f, calc(var(--hs) - 24px) calc(var(--hs) - 24px) 0 #14120f;
-}
-.cx-ceiling__dark {
+.cx-ceiling__img {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% 40%, #050403 20%, #000 80%);
-  transform-origin: 50% 0;
-  transform: scaleY(0);
-  transition: transform 1.8s steps(12, end);
-  box-shadow: inset 0 10px 22px #000;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  opacity: 0;
 }
-.cx-ceiling.is-open .cx-ceiling__dark { transform: scaleY(1); }
-.cx-ceiling.is-ajar .cx-ceiling__dark { transform: scaleY(0.08); transition-duration: 2.4s; }
+.cx-ceiling .im-plain { opacity: 1; }
+.cx-ceiling.has-hatch .im-closed { opacity: 1; }
+.cx-ceiling.has-hatch.is-ajar .im-ajar { opacity: 1; }
+.cx-ceiling.has-hatch.is-open .im-open { opacity: 1; }
+.cx-ceiling.has-vent .im-vent { opacity: 1; }
+.cx-ceiling__stain,
+.cx-ceiling__stain-face {
+  position: absolute;
+  top: 36%;
+  right: 14%;
+  width: clamp(80px, 16vw, 130px);
+  opacity: 0;
+  transition: opacity 3s ease;
+  filter: blur(0.6px) brightness(0.78) saturate(0.7);
+}
+.cx-ceiling.has-stain .cx-ceiling__stain { opacity: 1; }
+.cx-ceiling.is-face .cx-ceiling__stain-face { opacity: 1; transition-duration: 1.4s; }
 .cx-ceiling__beam {
   position: absolute;
   left: 50%;
-  top: 40%;
-  width: 280px;
-  height: 280px;
-  margin: -140px 0 0 -140px;
+  top: 38%;
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 240, 200, 0.34) 0%, rgba(255, 240, 200, 0.12) 38%, transparent 66%);
+  background: radial-gradient(circle, rgba(255, 244, 210, 0.42) 0%, rgba(255, 240, 200, 0.14) 38%, transparent 66%);
   mix-blend-mode: screen;
   opacity: 0;
   transition: opacity 0.6s ease;
 }
 .cx-ceiling.is-beam .cx-ceiling__beam { opacity: 1; }
-.cx-ceiling__vent {
-  position: absolute;
-  left: 50%;
-  top: 26%;
-  width: clamp(120px, 22vw, 180px);
-  height: 46px;
-  margin-left: calc(clamp(120px, 22vw, 180px) / -2);
-  background: #36322c;
-  border: 2px solid #17150f;
-  opacity: 0;
-  transition: opacity 2s ease;
-  overflow: hidden;
-}
-.cx-ceiling.has-vent .cx-ceiling__vent { opacity: 1; }
-.cx-ceiling__vent::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  background: #020202;
-}
-.cx-ceiling__vent::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(to bottom, transparent 0 7px, #38342d 7px 10px);
-}
 
-/* ---------- 暗がりの中の目 ---------- */
+/* ---------- 暗がりの目（暗闇に浮く、写真の目） ---------- */
 .cx-eyes {
+  --ew: min(250px, 56vw);
   position: fixed;
   z-index: 6800;
   pointer-events: none;
-  width: 70px;
-  height: 36px;
-  margin: -18px 0 0 -35px;
+  width: var(--ew);
+  aspect-ratio: 480 / 222;
+  margin: calc(var(--ew) * -0.231) 0 0 calc(var(--ew) * -0.5);
+  background: url("assets/cam/eyes.jpg") center / cover no-repeat;
+  mix-blend-mode: screen;
   opacity: 0;
   transition: opacity 0.35s ease;
 }
-.cx-eyes.is-on { opacity: 1; }
-.cx-eyes::before {
-  content: "";
-  position: absolute;
-  inset: -34px -46px;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.82) 30%, transparent 70%);
-}
-.cx-eyes i {
-  position: absolute;
-  top: 12px;
-  width: 15px;
-  height: 8px;
-  border-radius: 50% / 70%;
-  background: radial-gradient(ellipse, #fffbe0 15%, #f1e6a6 45%, rgba(240, 225, 150, 0) 78%);
-  box-shadow: 0 0 12px 4px rgba(250, 240, 180, 0.34);
-  transition: transform 0.1s ease;
-}
-.cx-eyes i:nth-child(1) { left: 11px; }
-.cx-eyes i:nth-child(2) { right: 11px; }
-.cx-eyes.is-blink i { transform: scaleY(0.08); }
-.cx-eyes.is-near { width: 130px; height: 64px; margin: -32px 0 0 -65px; }
-.cx-eyes.is-near i { top: 22px; width: 28px; height: 14px; }
-.cx-eyes.is-near i:nth-child(1) { left: 20px; }
-.cx-eyes.is-near i:nth-child(2) { right: 20px; }
+.cx-eyes.is-on { opacity: 0.95; }
+.cx-eyes.is-blink { transform: scaleY(0.06); transition: transform 0.09s ease, opacity 0.35s ease; }
+.cx-eyes.is-near { --ew: min(520px, 96vw); }
 
 /* ---------- まぶた（眠りに落ちる直前の、閉じていく視界） ---------- */
 .cx-lid {

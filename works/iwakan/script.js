@@ -110,7 +110,7 @@ const scenes = {
   },
   async "c3-cam-view"() {
     camReady();
-    CX.Cam.show({ scene: "gen", label: "CAM 01 玄関" });
+    CX.Cam.show({ frame: "genkan", label: "CAM 01 玄関" });
     await sleep(8000);
     CX.Cam.hide();
   },
@@ -120,12 +120,12 @@ const scenes = {
   },
   async "c3-ghost-frame"() {
     camReady();
-    CX.Cam.show({ scene: "gen", label: "CAM 01 玄関" });
+    CX.Cam.show({ frame: "genkan", label: "CAM 01 玄関" });
     await sleep(2600);
-    CX.Cam.set({ ghost: "on" });
+    CX.Cam.frame("genkan-ghost", { jolt: true }); // 廊下の突き当たりに、ほんの一瞬だけ“立っている”
     HorrorFX.staticBurst({ duration: 160, volume: 0.5 });
     await sleep(140);
-    CX.Cam.set({ ghost: null });
+    CX.Cam.frame("genkan");
     CX.HUD.glitch();
     await sleep(2400);
     CX.Cam.hide();
@@ -156,7 +156,7 @@ const scenes = {
   },
   async "c5-cam-empty"() {
     camReady();
-    CX.Cam.show({ scene: "gen", label: "CAM 01 玄関" });
+    CX.Cam.show({ frame: "genkan", label: "CAM 01 玄関" });
     await sleep(5200);
     CX.Cam.hide();
   },
@@ -197,7 +197,7 @@ const scenes = {
     CX.Ceiling.show({ "has-hatch": true, "is-open": true });
     const sweep = CX.Ceiling.sweep(7000);
     await sleep(4300);
-    CX.eyes({ x: "50%", y: "13%", ms: 380, blinks: 0 }); // 光の奥で一瞬だけ、何かが光る
+    CX.eyesIn("hatch", { ms: 380, blinks: 0 }); // 光の奥で一瞬だけ、何かが光る
     await sweep;
   },
   "c7-close"() {
@@ -209,7 +209,7 @@ const scenes = {
     HorrorFX.heartbeat({ duration: 4200, bpm: 96, volume: 0.38 });
     await sleep(1600);
     creakAbove({ vol: 0.75, close: true, delay: 900, pan: 0 });
-    CX.eyes({ x: "50%", y: "14%", ms: 2600, blinks: 1 });
+    CX.eyesIn("hatch", { ms: 2600, blinks: 1 });
     await sleep(3000);
     CX.Ceiling.set({ "is-ajar": false });
   },
@@ -262,7 +262,7 @@ const scenes = {
   /* 第十章 */
   "c10-cam-on"() {
     camReady();
-    CX.Cam.show({ scene: "room", label: "CAM 02 室内" });
+    CX.Cam.show({ frame: "room-closed", label: "CAM 02 室内" });
     S("beep", { volume: 0.5, wet: 0 });
   },
   "c10-led"() {
@@ -274,18 +274,21 @@ const scenes = {
     CX.Cam.setClock(null);
   },
   "c10-ajar"() {
-    CX.Cam.set({ door: "ajar" });
+    CX.Cam.frame("room-ajar", { jolt: true }); // クローゼットの扉が、ほんの少し開いている
     HorrorFX.staticBurst({ duration: 220, volume: 0.3 });
   },
   async "c10-door"() {
     camReady();
-    if (!CX.Cam.el.classList.contains("is-on")) CX.Cam.show({ scene: "room", label: "CAM 02 室内" });
+    if (!CX.Cam.el.classList.contains("is-on")) CX.Cam.show({ frame: "room-closed", label: "CAM 02 室内" });
+    CX.Cam.frame("room-closed");
     CX.HUD.on();
     CX.Cam.setClock({ h: 2, m: 2, s: 58, rate: 1 });
     CX.Cam.morph(true);
     HorrorFX.heartbeat({ duration: 4200, bpm: 110, volume: 0.4 });
     await sleep(1800);
-    CX.Cam.set({ door: "open" });
+    CX.Cam.frame("room-ajar", { jolt: true });
+    await sleep(900);
+    CX.Cam.frame("room-open", { jolt: true });
     S("wardrobe", { volume: 0.8, wet: 0.2, offset: 0.9, duration: 3.6 });
     HorrorFX.crackFlash({ duration: 480 });
     HorrorFX.shake(document.body, { duration: 400, sound: false });
@@ -302,64 +305,67 @@ const scenes = {
   },
   "c11-replay"() {
     camReady();
-    CX.Cam.show({ big: true, scene: "room", label: "CAM 02 室内", clock: { h: 2, m: 2, s: 50, rate: 1 } });
+    CX.Cam.show({ big: true, frame: "room-closed", label: "CAM 02 室内", clock: { h: 2, m: 2, s: 50, rate: 1 } });
     S("beep", { volume: 0.5, wet: 0 });
   },
-  "c11-door"() {
-    CX.Cam.set({ door: "open" });
+  async "c11-door"() {
+    CX.Cam.frame("room-ajar", { jolt: true });
+    await sleep(900);
+    CX.Cam.frame("room-open", { jolt: true });
     S("wardrobe", { volume: 0.85, wet: 0.2, offset: 0.9, duration: 3.6 });
   },
   "c11-arm"() {
-    CX.Cam.set({ arm: "out" });
+    CX.Cam.frame("room-arm", { jolt: true });
     S("plastic-a", { volume: 0.4, offset: 2, duration: 4, wet: 0.2 });
     HorrorFX.staticBurst({ duration: 200, volume: 0.35 });
   },
   async "c11-crawl"() {
-    CX.Cam.set({ pose: "crawl-a" });
+    CX.Cam.frame("room-ghost", { jolt: true });
     await sleep(1400);
     HorrorFX.jumpscare({ image: A + "scare-hair.jpg", sound: false, duration: 650 });
     S("scare-b", { volume: 0.9, wet: 0.1, duration: 3 });
     HorrorFX.haptic([120, 40, 300]);
     await sleep(900);
-    CX.Cam.set({ arm: null, pose: "crawl-b" });
+    CX.Cam.frame("room-ghost2", { jolt: true });
     await sleep(5200);
-    CX.Cam.set({ pose: "crawl-c" });
+    CX.Cam.frame("room-open", { jolt: true });
   },
   async "c11-stare"() {
-    CX.Cam.set({ pose: "rise" });
     HorrorFX.silence({ duration: 15000, visual: false, restoreMs: 3000 });
-    await sleep(4300);
-    CX.Cam.set({ pose: "stand" });
-    await sleep(3300);
-    CX.Cam.zoom({ x: 30, y: 33, scale: 2.4, ms: 9000 });
-    await sleep(8200);
-    CX.Cam.set({ look: "on" }); // 画面の向こう——こちらを見る
+    await sleep(1200);
+    CX.Cam.frame("room-stand", { jolt: true }); // 次のコマでは、もう部屋の中に立っている
+    await sleep(2600);
+    CX.Cam.zoom({ x: 22, y: 14, scale: 2.8, ms: 9000 }); // その横顔へ、ゆっくり寄っていく
+    await sleep(8800);
+    CX.Cam.frame("room-stare", { jolt: true }); // こちらを向いた——髪に覆われた顔
     HorrorFX.heartbeat({ duration: 4200, bpm: 100, volume: 0.35 });
+    HorrorFX.haptic([80, 40, 160]);
     await sleep(4300);
     HorrorFX.staticBurst({ duration: 450, volume: 0.5 });
     await CX.Cam.cut(260);
-    CX.Cam.set({ look: null });
     CX.Cam.unzoom();
+    CX.Cam.frame("room-empty");
   },
   async "c11-fridge"() {
     CX.Cam.unzoom();
-    CX.Cam.set({ look: null, pose: "fridge" });
-    await sleep(3000);
-    CX.Cam.set({ fridge: "open" });
+    CX.Cam.label("CAM 03 台所");
+    CX.Cam.frame("kitchen", { jolt: true });
+    await sleep(900);
     S("fridge-open", { volume: 0.8, wet: 0.15 });
     await sleep(2400);
     S("plastic-a", { volume: 0.18, offset: 3, duration: 3.5, wet: 0.3, pan: -0.5 });
   },
   async "c11-return"() {
-    CX.Cam.set({ fridge: null, pose: "back-a" });
-    await sleep(6200);
-    CX.Cam.set({ pose: "back-b" });
-    await sleep(4200);
-    CX.Cam.set({ door: "shut" });
+    CX.Cam.label("CAM 02 室内");
+    CX.Cam.frame("room-ghost2", { jolt: true }); // 戸口へ戻ってくる
+    await sleep(5200);
+    CX.Cam.frame("room-open", { jolt: true });
+    await sleep(2400);
+    CX.Cam.frame("room-ajar", { jolt: true });
     S("wardrobe", { volume: 0.6, wet: 0.2, offset: 3.6, duration: 2.8 });
-    await sleep(900);
-    CX.Cam.set({ pose: "gone" });
-    await sleep(1800);
+    await sleep(1200);
+    CX.Cam.frame("room-closed", { jolt: true });
+    await sleep(2400);
     CX.Cam.lost();
     CX.HUD.glitch();
     HorrorFX.staticBurst({ duration: 500 });
@@ -381,7 +387,7 @@ const scenes = {
   async "c12-vent-eyes"() {
     CX.Ceiling.show({ "has-vent": true });
     await sleep(900);
-    CX.eyes({ x: "50%", y: "11%", ms: 2200, blinks: 1 });
+    CX.eyesIn("vent", { ms: 2200, blinks: 1 });
   },
   async "c12-everywhere"() {
     HorrorFX.crackFlash({ duration: 500 });
@@ -452,7 +458,7 @@ const scenes = {
   /* あとがき */
   "ae-cam"() {
     camReady();
-    CX.Cam.show({ scene: "new", label: "CAM 01 新居" });
+    CX.Cam.show({ frame: "new-empty", label: "CAM 01 新居" });
     S("beep", { volume: 0.45, wet: 0 });
     CX.HUD.on();
   },
@@ -470,18 +476,17 @@ const scenes = {
   async "ae-finale"() {
     HorrorFX.silence({ restore: false, visual: true });
     camReady();
-    CX.Cam.show({ big: true, scene: "new", label: "CAM 01 新居", clock: null });
+    CX.Cam.show({ big: true, frame: "new-empty", label: "CAM 01 新居", clock: null });
     CX.HUD.on();
     S("beep", { volume: 0.5, wet: 0 });
     await sleep(4200);
     // 映像が一瞬途切れ、戻ったときには——ベッドの足元に、立っている
     CX.Cam.cut(140);
-    CX.Cam.set({ pose: "new-stand" });
+    CX.Cam.frame("new-figure", { jolt: true });
     HorrorFX.staticBurst({ duration: 220, volume: 0.45 });
     CX.HUD.glitch();
     await sleep(4000);
-    CX.Cam.set({ look: "on" });
-    CX.Cam.zoom({ x: 47, y: 38, scale: 2.5, ms: 5200 });
+    CX.Cam.zoom({ x: 88, y: 44, scale: 2.6, ms: 5200 }); // 右の壁際に立つ、長い服の人影へ寄っていく
     HorrorFX.heartbeat({ duration: 5200, bpm: 96, volume: 0.35 });
     await sleep(5400);
     HorrorFX.jumpscare({ image: A + "scare-doorway.jpg", sound: false, duration: 900 });
