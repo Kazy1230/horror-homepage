@@ -1,0 +1,500 @@
+/* 「後坂」ページ固有の見た目。共通演出は ../../common/horror.css 側 */
+
+.story {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 10vh 1.5rem 30vh;
+  background: var(--hfx-frame-bg);
+  color: #d8d4cc;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 50px 120px -25px rgba(0, 0, 0, 0.95);
+  transition: transform 1.6s ease, filter 2s ease;
+}
+
+.story .work-title {
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: #777;
+  margin: 0 0 1.5rem;
+}
+
+.story h1 {
+  font-size: 2.1rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+  margin: 0 0 4.5rem;
+  text-indent: 0.35em;
+}
+
+.story h2,
+.story .page-h {
+  font-size: 1.35rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  margin: 6rem 0 5rem;
+  color: #e6ddd0;
+  font-weight: normal;
+}
+.story .page-h { margin-top: 0; margin-bottom: 4.5rem; font-size: 1.5rem; }
+.story h2::after,
+.story .page-h::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  margin: 1.4rem auto 0;
+  background: linear-gradient(90deg, transparent, #b3141f, transparent);
+}
+
+.story p {
+  margin: 0 0 7.2rem;
+  font-size: 1.05rem;
+}
+
+.story .quote-line {
+  text-align: center;
+  font-size: 1.12rem;
+  margin: 6.4rem 0 8rem;
+  color: #eee;
+}
+
+.story .strong-line {
+  text-align: center;
+  font-size: 1.25rem;
+  letter-spacing: 0.12em;
+  margin: 7rem 0 8rem;
+}
+.story strong {
+  font-weight: normal;
+  color: #e8c2b8;
+  text-shadow: 0 0 14px rgba(200, 30, 40, 0.45);
+}
+
+hr.brk {
+  border: 0;
+  height: 1px;
+  width: 4rem;
+  margin: 2rem auto 8rem;
+  background: linear-gradient(90deg, transparent, rgba(190, 40, 48, 0.7), transparent);
+}
+
+/* ---------- 資料（引用）：古文書／メール／謄写版／メモ ---------- */
+.story blockquote.doc {
+  margin: 4rem 0 7.6rem;
+  padding: 2.2rem 1.4rem 0.8rem;
+  border-left: 2px solid rgba(160, 120, 70, 0.7);
+  background: rgba(86, 66, 40, 0.2);
+  position: relative;
+}
+.story blockquote.doc p {
+  margin: 0 0 2.4rem;
+  font-size: 1rem;
+  line-height: 2;
+}
+.story blockquote.doc .doc-star {
+  text-align: center;
+  letter-spacing: 0.4em;
+  color: #9a8a6c;
+  margin: 0 0 2.4rem;
+}
+.story blockquote.doc--old {
+  color: #e6d6b2;
+  letter-spacing: 0.08em;
+  background: rgba(96, 72, 40, 0.24);
+  border-left-color: rgba(176, 130, 70, 0.8);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+}
+.story blockquote.doc--mail {
+  color: #c9d4dc;
+  border-left-color: rgba(100, 130, 150, 0.7);
+  background: rgba(44, 58, 70, 0.22);
+  font-family: "Yu Gothic", "游ゴシック", "Hiragino Sans", sans-serif;
+}
+.story blockquote.doc--mail p { font-size: 0.95rem; }
+.story blockquote.doc--mimeo {
+  color: #d0d8e2;
+  border-left-color: rgba(130, 150, 180, 0.7);
+  background: rgba(190, 200, 215, 0.07);
+  letter-spacing: 0.04em;
+}
+.story blockquote.doc--memo {
+  color: #ddd3b4;
+  border-left-color: rgba(180, 160, 110, 0.7);
+  background: rgba(120, 110, 80, 0.14);
+  font-family: "Zen Kurenaido", "Yu Mincho", "游明朝", serif;
+  font-size: 1.1rem;
+}
+.story blockquote.doc--memo p { font-size: 1.12rem; letter-spacing: 0.06em; }
+
+/* ---------- 本文のナビ ---------- */
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  padding-top: 2rem;
+  margin-top: 3rem;
+  border-top: 1px solid #2a2a2a;
+}
+.chapter-nav .prev.is-disabled,
+.chapter-nav .next.is-disabled { color: #444; pointer-events: none; }
+.chapter-nav a { color: #999; text-decoration: none; }
+.chapter-nav a:hover { color: #fff; }
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 5rem;
+  color: #666;
+  font-size: 0.78rem;
+}
+
+/* ---------- 入場ゲート（古地図に、赤い坂が引かれていく） ---------- */
+.hfx-gate.us-gate {
+  background: #040302;
+  color: #d8cfc0;
+}
+.hfx-gate.us-gate::before {
+  inset: 0;
+  height: auto;
+  opacity: 0.34;
+  background: url("assets/bg-map.jpg") center / cover no-repeat;
+  filter: blur(1.5px) sepia(0.35) brightness(0.6);
+}
+.hfx-gate.us-gate::after {
+  inset: 0;
+  height: auto;
+  opacity: 1;
+  background: radial-gradient(ellipse at 50% 55%, transparent 25%, rgba(0, 0, 0, 0.88) 78%);
+}
+.us-gate__line {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.us-gate__line path {
+  fill: none;
+  stroke: #e2182c;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 6px rgba(255, 30, 50, 0.85));
+  animation: us-gate-draw 5.5s cubic-bezier(0.3, 0.1, 0.2, 1) 0.8s forwards;
+}
+@keyframes us-gate-draw { to { stroke-dashoffset: 0; } }
+.hfx-gate.us-gate .hfx-gate__title { text-shadow: 0 0 16px rgba(200, 30, 40, 0.4), 0 2px 8px #000; }
+.hfx-gate.us-gate .hfx-gate__note {
+  max-width: 28em;
+  padding: 0 1.4rem;
+  line-height: 1.95;
+  opacity: 0.8;
+  text-shadow: 0 2px 8px #000;
+}
+.hfx-gate.us-gate .hfx-gate__warning { z-index: 3; }
+
+/* ---------- 赤い線（坂） ---------- */
+.us-red {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.us-red--front { z-index: 6200; }
+.us-red--back { z-index: 0; }
+.us-red svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.us-red path {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.us-red .core {
+  stroke: #e3162b;
+  stroke-width: 2.6;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 5px rgba(255, 24, 48, 0.9)) drop-shadow(0 0 16px rgba(220, 10, 30, 0.55));
+  transition: stroke-dashoffset var(--ms, 3000ms) cubic-bezier(0.3, 0.1, 0.2, 1);
+}
+.us-red .sheen {
+  stroke: rgba(255, 220, 214, 0.95);
+  stroke-width: 1.4;
+  stroke-dasharray: 0.07 1;
+  stroke-dashoffset: 0.07;
+  opacity: 0;
+}
+.us-red svg.is-drawn .core { stroke-dashoffset: 0; }
+.us-red svg.is-sheen .sheen { opacity: 1; animation: us-sheen 2.6s ease-in-out forwards; }
+@keyframes us-sheen { from { stroke-dashoffset: 0.07; } to { stroke-dashoffset: -1; } }
+.us-red svg { transition: opacity var(--fade, 1800ms) ease; opacity: 1; }
+.us-red svg.is-out { opacity: 0; }
+
+.us-rim {
+  position: fixed;
+  inset: 0;
+  z-index: 6150;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(150, 8, 20, 0.5) 100%);
+  transition: opacity 1.2s ease;
+}
+.us-rim.is-on { opacity: 1; animation: us-rim-pulse 1.8s ease-in-out infinite; }
+@keyframes us-rim-pulse { 50% { opacity: 0.55; } }
+
+/* ---------- 日本地図（点が増え、線が伸び、最後に“私”へ届く） ---------- */
+.us-map {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 6300;
+  width: min(86vw, 480px);
+  aspect-ratio: 4 / 5;
+  transform: translate(-50%, -50%) scale(0.96);
+  opacity: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(10, 8, 5, 0.78), rgba(10, 8, 5, 0.82)),
+    url("assets/bg-map.jpg") center / cover no-repeat;
+  border: 1px solid rgba(180, 140, 80, 0.4);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.7), 0 20px 70px rgba(0, 0, 0, 0.9);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+.us-map.is-on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.us-map svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.us-map path {
+  fill: none;
+  stroke: #e3162b;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 4px rgba(255, 24, 48, 0.8));
+  transition: stroke-dashoffset 1.1s ease;
+}
+.us-map path.is-on { stroke-dashoffset: 0; }
+.us-dot {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: #e3162b;
+  box-shadow: 0 0 10px 3px rgba(240, 20, 40, 0.65);
+  opacity: 0;
+  transform: scale(0.2);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.us-dot.is-on { opacity: 1; transform: scale(1); }
+.us-dot.is-me { background: transparent; border: 2px solid #e3162b; animation: us-dot-pulse 1.4s ease-in-out infinite; }
+@keyframes us-dot-pulse { 50% { box-shadow: 0 0 18px 8px rgba(240, 20, 40, 0.7); } }
+.us-dot span {
+  position: absolute;
+  left: 18px;
+  top: -9px;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  color: #e8dcc8;
+  text-shadow: 0 1px 4px #000;
+}
+
+/* ---------- 窓ガラス（映り込みの中で、道が坂になっている） ---------- */
+.us-glass {
+  position: fixed;
+  inset: 0;
+  z-index: 6300;
+  pointer-events: none;
+  background: #02040a;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  overflow: hidden;
+}
+.us-glass.is-on { opacity: 1; }
+.us-glass__view {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: min(92vh, 150vw);
+  aspect-ratio: 2 / 3;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 6px solid #0b0d12;
+  box-shadow: 0 0 0 2px #2a2f3a, 0 0 80px rgba(0, 0, 0, 0.9);
+}
+.us-glass__refl {
+  position: absolute;
+  inset: -4%;
+  background: url("assets/crowd.jpg") center / cover no-repeat;
+  transform: scaleX(-1);
+  filter: grayscale(0.4) brightness(0.8) contrast(1.15) hue-rotate(185deg) saturate(1.6) blur(0.8px);
+  opacity: 0;
+  transform-origin: 50% 90%;
+  transition: opacity 1.6s ease, transform var(--zt, 0s) cubic-bezier(0.5, 0, 0.3, 1);
+}
+.us-glass.is-reveal .us-glass__refl { opacity: 1; }
+.us-glass__base {
+  position: absolute;
+  inset: 0;
+  background: url("assets/bg-river2.jpg") center / cover no-repeat;
+  transform: scaleX(-1);
+  filter: grayscale(0.5) brightness(0.45) hue-rotate(185deg) saturate(1.4) blur(0.6px);
+  opacity: 0.95;
+  transition: opacity 1.2s ease;
+}
+.us-glass.is-reveal .us-glass__base { opacity: 0.1; }
+.us-glass__back {
+  position: absolute;
+  left: 50%;
+  bottom: -2%;
+  height: 56%;
+  aspect-ratio: 0.451;
+  transform: translateX(-50%);
+  background: url("../../common/shadow-man.png") center bottom / contain no-repeat;
+  filter: invert(1) brightness(0.12) blur(0.4px);
+  opacity: 0.96;
+}
+.us-glass__gloss {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, rgba(190, 215, 255, 0.16) 0%, transparent 28%, transparent 55%, rgba(190, 215, 255, 0.07) 70%, transparent 82%),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.75) 100%);
+}
+.us-glass__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  top: 58%;
+  background: #0b0d12;
+  box-shadow: 0 0 0 1px #1f2430;
+  opacity: 0.85;
+}
+.us-glass.is-flick .us-glass__refl { animation: us-flick 0.5s steps(2, end); }
+@keyframes us-flick { 0% { opacity: 0.2; } 50% { opacity: 1; filter: brightness(1.6); } }
+
+/* ---------- 画面の隅に覗く、坂の写真 ---------- */
+.us-peek {
+  position: fixed;
+  z-index: 6100;
+  width: min(34vw, 240px);
+  aspect-ratio: 2 / 3;
+  pointer-events: none;
+  background: url("assets/crowd.jpg") center / cover no-repeat;
+  filter: grayscale(0.55) brightness(0.62) contrast(1.1) blur(1.2px);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 32%, transparent 72%);
+  mask-image: radial-gradient(ellipse at center, #000 32%, transparent 72%);
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.us-peek.is-on { opacity: var(--po, 0.55); }
+
+/* ---------- 立ち止まる／振り向く／傾く ---------- */
+.us-lid {
+  position: fixed;
+  left: -4%;
+  right: -4%;
+  z-index: 8900;
+  background: #000;
+  height: 0;
+  pointer-events: none;
+  transition: height var(--us-lid-t, 2.2s) cubic-bezier(0.35, 0, 0.25, 1);
+  box-shadow: 0 0 40px 24px #000;
+}
+.us-lid--top { top: 0; border-radius: 0 0 50% 50% / 0 0 22vh 22vh; }
+.us-lid--bottom { bottom: 0; border-radius: 50% 50% 0 0 / 22vh 22vh 0 0; }
+.us-lid.is-closed { height: 54vh; }
+
+body.us-tilt .story { transform: rotate(var(--tilt, -3.5deg)); transform-origin: 50% 40vh; }
+body.us-turn .story {
+  transform: perspective(1500px) rotateY(-23deg) translateX(7%);
+  transition: transform 3.6s cubic-bezier(0.4, 0, 0.3, 1);
+}
+body.us-turn-snap .story { transition: transform 0.18s ease-out; }
+body.us-slope::before { transform: rotate(-11deg) scale(1.4); transition: transform 7s ease; }
+body.us-dim .story { filter: brightness(0.32) saturate(0.6); }
+body.us-flicker .story { animation: us-story-flicker 0.9s steps(1, end); }
+@keyframes us-story-flicker {
+  0%, 100% { filter: none; }
+  12% { filter: brightness(0.15); }
+  22% { filter: none; }
+  40% { filter: brightness(0.25); }
+  46% { filter: none; }
+  70% { filter: brightness(0.1); }
+  78% { filter: none; }
+}
+.us-cold-ov {
+  position: fixed;
+  inset: 0;
+  z-index: 6100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(18, 36, 70, 0.72) 100%);
+}
+body.us-cold .us-cold-ov { opacity: 1; }
+body.us-cold .story { filter: saturate(0.25) brightness(0.92) hue-rotate(185deg); }
+
+/* 最後の「おかえり」の黒 */
+.us-black {
+  position: fixed;
+  inset: 0;
+  z-index: 8800;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.us-black.is-on { opacity: 1; }
+
+/* 大きな一言（振り向くな） */
+.us-word {
+  position: fixed;
+  left: 50%;
+  top: 46%;
+  z-index: 8000;
+  transform: translate(-50%, -50%);
+  font-size: clamp(2rem, 9vw, 4.2rem);
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: #e3162b;
+  text-shadow: 0 0 24px rgba(220, 10, 30, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.4s ease;
+  white-space: nowrap;
+}
+.us-word.is-on { opacity: 0.95; }
+
+.story .strong-line.slow-reveal { min-height: 1.8em; }
+.story .slow-reveal { min-height: 1.8em; }
+.story .gomen { font-size: 2rem; letter-spacing: 0.2em; color: #d4152a; }
+
+@media (max-width: 600px) {
+  .story h1 { font-size: 1.8rem; }
+  .us-peek { width: 44vw; }
+}
+
+/* ---------- 赤い線の欠片（コマ送りで、右から左へ這ってくる） ---------- */
+.us-seg {
+  position: fixed;
+  z-index: 6200;
+  width: 24vw;
+  height: 3px;
+  background: #e3162b;
+  box-shadow: 0 0 10px 2px rgba(240, 20, 40, 0.7), 0 0 28px 6px rgba(200, 10, 30, 0.4);
+  transform: rotate(-34deg);
+  transform-origin: left center;
+  opacity: 0;
+  pointer-events: none;
+  transition: left 0.12s steps(2, end), opacity 1s ease;
+}
+.us-seg.is-on { opacity: 1; }

@@ -868,12 +868,13 @@
 
   // 足音の元になる音源を登録する。steps は歩く音、drags は引きずる音、creaks は床板のきしみ。
   function setFootstepSamples({ steps = [], drags = [], creaks = [] } = {}) {
-    steps.forEach((u, i) => loadSample("hfx-step-" + i, u));
-    drags.forEach((u, i) => loadSample("hfx-drag-" + i, u));
-    creaks.forEach((u, i) => loadSample("hfx-creak-" + i, u));
-    stepPool.steps = steps.map((_, i) => "hfx-step-" + i);
-    stepPool.drags = drags.map((_, i) => "hfx-drag-" + i);
-    stepPool.creaks = creaks.map((_, i) => "hfx-creak-" + i);
+    // 名前は URL から付ける（別の音源セットに切り替えて何度も呼べるように）
+    steps.forEach((u) => loadSample("hfx-step:" + u, u));
+    drags.forEach((u) => loadSample("hfx-drag:" + u, u));
+    creaks.forEach((u) => loadSample("hfx-creak:" + u, u));
+    stepPool.steps = steps.map((u) => "hfx-step:" + u);
+    stepPool.drags = drags.map((u) => "hfx-drag:" + u);
+    stepPool.creaks = creaks.map((u) => "hfx-creak:" + u);
   }
 
   function slicesOf(data, { lead = 0.03, maxDur = 0.85 } = {}) {
